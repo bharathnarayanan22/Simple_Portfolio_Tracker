@@ -37,15 +37,26 @@ const Register = () => {
 
     try {
       const response = await axios.post(apiUrl, requestData);
+
+      // Handling success response
       await toast.success(`${isSignUp ? 'Signup' : 'Login'} Successful`);
+      
       if (isSignUp) {
         setFormData({ ...formData, isSignUp: false });
       } else {
-        const { token, userId, name } = response.data;
-        localStorage.setItem('token', token);
-        localStorage.setItem('userId', userId);
-        localStorage.setItem('name', name);
-        navigate('/dashboard');
+        const { id, name, token } = response.data; // Assuming server sends {id, name, token}
+        console.log('Server Response:', response.data);
+
+        if (id && name && token) {
+          // Save user data in localStorage
+          localStorage.setItem('userId', id); // Save userId
+          localStorage.setItem('name', name); // Save user name
+          localStorage.setItem('token', token); // Save JWT token
+        } else {
+          console.error('Missing data in server response:', response.data);
+        }
+        
+        navigate('/dashboard'); // Redirect to dashboard
       }
     } catch (error) {
       console.error(`${isSignUp ? 'Signup' : 'Login'} failed:`, error);
