@@ -1,6 +1,11 @@
 package com.example.backend.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "stocks")
@@ -10,16 +15,16 @@ public class Stock {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String stock_name; // Changed here
 
     @Column(nullable = false, unique = true)
     private String ticker;
 
     @Column(nullable = false)
-    private int quantity;
+    private int volume;
 
     @Column(nullable = false)
-    private double buyPrice;
+    private double price;
 
     // Getters and Setters
     public Long getId() {
@@ -30,12 +35,12 @@ public class Stock {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getStock_name() { // Updated getter
+        return stock_name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setStock_name(String stock_name) { // Updated setter
+        this.stock_name = stock_name;
     }
 
     public String getTicker() {
@@ -46,19 +51,19 @@ public class Stock {
         this.ticker = ticker;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getVolume() {
+        return volume;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setVolume(int volume) {
+        this.volume = volume;
     }
 
-    public double getBuyPrice() {
-        return buyPrice;
+    public double getPrice() {
+        return price;
     }
 
-    public void setBuyPrice(double buyPrice) {
-        this.buyPrice = buyPrice;
+    public void setPrice(double price) {
+        this.price = price;
     }
 }

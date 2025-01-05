@@ -28,7 +28,7 @@ import WatchlistComponent from "../components/WatchlistComponent";
 import TransactionsComponent from "../components/TransactionsComponent";
 
 const drawerWidth = 240;
-const userName = localStorage.getItem('name');
+const userName = localStorage.getItem("name");
 
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
   ({ theme, open }) => ({
@@ -87,7 +87,9 @@ const theme = createTheme({
 
 export default function PortfolioTrackerDashboard() {
   const [open, setOpen] = useState(false);
-  const [selectedView, setSelectedView] = useState("Overview"); // Set default to "Overview"
+  const [selectedView, setSelectedView] = useState("Overview");
+  const [isBuying1, setIsBuying1] = useState(false);
+  const [view1, setView1] = useState("cards");
 
   const navigate = useNavigate();
 
@@ -108,11 +110,35 @@ export default function PortfolioTrackerDashboard() {
     navigate("/register");
   };
 
+  const handleBuyClick = () => {
+    setIsBuying1(true);
+    setView1("stocks");
+    setSelectedView("Stocks Management");
+  };
+
+  const handleSellClick = () => {
+    setIsBuying1(false);
+    setView1("stocks");
+    setSelectedView("Stocks Management");
+  };
+
+  const handleWatchlistClick = () => {
+    setSelectedView("Watchlist");
+  };
+
+  const handleExportClick = () => {
+    console.log("Export button clicked");
+    // Add logic for exporting portfolio
+  };
+
+  const handlePortfolioClick = () => {
+    setSelectedView("Portfolio");
+  };
+
   const selectedStyle = {
     backgroundColor: "#013d79",
     color: "white",
   };
-
 
   return (
     <ThemeProvider theme={theme}>
@@ -237,9 +263,23 @@ export default function PortfolioTrackerDashboard() {
         </Drawer>
         <Main open={open}>
           <DrawerHeader />
-          {selectedView === "Overview" && <OverviewComponent />}
-          {selectedView === "Stocks Management" && <StocksManagementComponent />}
-          {selectedView === "Portfolio" && <PortfolioComponent />}
+          {selectedView === "Overview" && <OverviewComponent onNavigateToPortfolio={handlePortfolioClick} />}
+          {selectedView === "Stocks Management" && (
+            <StocksManagementComponent
+              isBuying1={isBuying1}
+              setIsBuying1={setIsBuying1}
+              view1={view1}
+              setView1={setView1}
+            />
+          )}
+          {selectedView === "Portfolio" && (
+            <PortfolioComponent
+              onBuyClick={handleBuyClick}
+              onSellClick={handleSellClick}
+              onWatchlistClick={handleWatchlistClick}
+              onExportClick={handleExportClick}
+            />
+          )}
           {selectedView === "Watchlist" && <WatchlistComponent />}
           {selectedView === "Transactions" && <TransactionsComponent />}
         </Main>

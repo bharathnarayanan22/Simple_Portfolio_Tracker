@@ -3,10 +3,13 @@ package com.example.backend.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.backend.model.Stock;
 import com.example.backend.model.User;
 import com.example.backend.model.UserStock;
+import com.example.backend.model.Watchlist;
 import com.example.backend.response.BuyStockRequest;
 import com.example.backend.response.SellStockRequest;
+import com.example.backend.response.WatchlistRequest;
 
 public interface UserService {
     User saveUser(User user);
@@ -27,4 +30,9 @@ public interface UserService {
     Double getUserFunds(Long userId);
 
     List<UserStock> getOwnedStocksByUserId(Long userId);
+
+    void addStockToWatchlist(Long userId, WatchlistRequest watchlistRequest);
+
+    void removeStockFromWatchlist(Long userId, WatchlistRequest watchlistRequest);
+    List<Long> getStockIdsByUserId(Long userId);
 }

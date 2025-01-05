@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,13 +12,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.example.backend.model.Watchlist;
+import com.example.backend.model.Stock;
 import com.example.backend.model.Transaction;
 import com.example.backend.model.UserStock;
 import com.example.backend.repository.TransactionRepository;
 import com.example.backend.repository.UserStockRepository;
 import com.example.backend.response.BuyStockRequest;
 import com.example.backend.response.SellStockRequest;
+import com.example.backend.response.WatchlistRequest;
 import com.example.backend.service.UserService;
 
 @RestController
@@ -73,6 +76,24 @@ public class UserController {
     @GetMapping("/{userId}/transactions")
     public ResponseEntity<List<Transaction>> getTransactions(@PathVariable Long userId) {
         return ResponseEntity.ok(transactionRepository.findByUserId(userId));
+    }
+
+    @PostMapping("/{userId}/watchlist")
+    public ResponseEntity<String> addStockToWatchlist(@PathVariable Long userId, @RequestBody WatchlistRequest watchlistRequest) {
+        userService.addStockToWatchlist(userId, watchlistRequest);
+        return ResponseEntity.ok("Stock added to watchlist successfully!");
+    }
+
+    @DeleteMapping("/{userId}/watchlist")
+    public ResponseEntity<String> removeStockFromWatchlist(@PathVariable Long userId,
+            @RequestBody WatchlistRequest watchlistRequest) {
+        userService.removeStockFromWatchlist(userId, watchlistRequest);
+        return ResponseEntity.ok("Stock removed from watchlist successfully!");
+    }
+
+    @GetMapping("/{userId}/watchlist")
+    public List<Long> getStockIdsByUserId(@PathVariable Long userId) {
+        return userService.getStockIdsByUserId(userId);
     }
 
 }

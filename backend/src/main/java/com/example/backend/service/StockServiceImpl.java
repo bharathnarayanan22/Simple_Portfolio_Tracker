@@ -26,13 +26,19 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
+    public Stock getStockById(Long id) {
+        return stockRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Stock not found with id " + id));
+    }
+
+    @Override
     public Stock updateStock(Long id, Stock stockDetails) {
         Stock stock = stockRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Stock not found with id " + id));
-        stock.setName(stockDetails.getName());
+        stock.setStock_name(stockDetails.getStock_name());
         stock.setTicker(stockDetails.getTicker());
-        stock.setQuantity(stockDetails.getQuantity());
-        stock.setBuyPrice(stockDetails.getBuyPrice());
+        stock.setVolume(stockDetails.getVolume());
+        stock.setPrice(stockDetails.getPrice());
         return stockRepository.save(stock);
     }
 

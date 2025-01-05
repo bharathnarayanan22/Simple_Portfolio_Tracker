@@ -9,4 +9,6 @@ public interface StockService {
     List<Stock> getAllStocks();
     Stock updateStock(Long id, Stock stockDetails);
     void deleteStock(Long id);
+    Stock getStockById(Long id);
+
 }

@@ -33,6 +33,12 @@ public class StockController {
         return ResponseEntity.ok(stockService.getAllStocks());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Stock> getStockById(@PathVariable Long id) {
+        Stock stock = stockService.getStockById(id);
+        return ResponseEntity.ok(stock);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Stock> updateStock(@PathVariable Long id, @RequestBody Stock stockDetails) {
         return ResponseEntity.ok(stockService.updateStock(id, stockDetails));

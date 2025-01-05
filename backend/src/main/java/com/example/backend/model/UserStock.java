@@ -31,6 +31,7 @@ public class UserStock {
     private User user;
 
     private String stockName;
+    
 
     private String ticker;
 

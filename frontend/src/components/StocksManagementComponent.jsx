@@ -16,55 +16,94 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  IconButton,
+  Modal,
 } from "@mui/material";
+import { Star, StarBorder } from "@mui/icons-material";
+
 import axios from "axios";
+import PropTypes from "prop-types";
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const generateRandomPrice = (basePrice) => {
   const fluctuation = (Math.random() - 0.5) * 2;
   return Math.max(basePrice + fluctuation, 1);
 };
 
-const StocksManagementComponent = () => {
-  const [isBuying, setIsBuying] = useState(true); // To control Buy/Sell toggle
-  const [view, setView] = useState("cards"); // To control current view
+
+const StocksManagementComponent = ({ isBuying1, view1, setIsBuying1, setView1 }) => {
+  const [isBuying, setIsBuying] = useState(false); 
+  const [view, setView] = useState("cards"); 
   const [stocks, setStocks] = useState([]);
   const [ownedStocks, setOwnedStocks] = useState([]);
+  const [watchlist, setWatchlist] = useState([]);
   const [funds, setFunds] = useState(0);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [quantities, setQuantities] = useState({});
+  const [portfolio, setPortfolio] = useState([]);
   const userId = localStorage.getItem("userId");
+  const [openModal, setOpenModal] = useState(false);
+  const [quantityToSell, setQuantityToSell] = useState(0);
+  const [selectedStock, setSelectedStock] = useState(null);
+
+
+  const handleBackClick = () => {
+    setIsBuying1(false); 
+    setView1("cards"); 
+    setView("cards"); 
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch funds
-        const fundsResponse = await axios.get(`http://localhost:8080/api/users/${userId}/funds`);
+        const fundsResponse = await axios.get(
+          `http://localhost:8080/api/users/${userId}/funds`
+        );
         setFunds(fundsResponse.data);
 
-        // Generate available stocks (mock data)
-        const initialStocks = Array.from({ length: 20 }, (_, index) => ({
-          id: index + 1,
-          stockName: `Stock ${index + 1}`,
-          ticker: `STK${index + 1}`,
-          price: generateRandomPrice(100),
-          volume: Math.floor(Math.random() * 10000) + 1000,
+        // Fetch stocks from the database
+        const stocksResponse = await axios.get("http://localhost:8080/stocks");
+        const initialStocks = stocksResponse.data.map((stock) => ({
+          ...stock,
+          price: generateRandomPrice(stock.price || 100), // Add initial price if not present
         }));
         setStocks(initialStocks);
 
-        // Fetch user-owned stocks (mock endpoint)
+        // Fetch user-owned stocks
         const ownedStocksResponse = await axios.get(
           `http://localhost:8080/api/users/${userId}/stocks`
         );
         setOwnedStocks(ownedStocksResponse.data);
+
+        const response = await axios.get(
+          `http://localhost:8080/api/users/${userId}/portfolio`
+        );
+        const portfolioData = response.data;
+
+        // Mock current prices for selling
+        const updatedData = portfolioData.map((stock) => ({
+          ...stock,
+          currentPrice: stock.purchasePrice * (1 + Math.random() * 0.2 - 0.1),
+        }));
+
+        setPortfolio(updatedData);
+
+        const watchlistResponse = await axios.get(
+          `http://localhost:8080/api/users/${userId}/watchlist`
+        );
+        setWatchlist(watchlistResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, [funds, userId]);
+  }, [userId]);
 
   useEffect(() => {
     // Update stock prices every 5 seconds
@@ -72,7 +111,7 @@ const StocksManagementComponent = () => {
       setStocks((prevStocks) =>
         prevStocks.map((stock) => ({
           ...stock,
-          price: generateRandomPrice(stock.price),
+          price: generateRandomPrice(stock.price), // Simulate dynamic price changes
         }))
       );
     }, 5000);
@@ -88,64 +127,134 @@ const StocksManagementComponent = () => {
       setLoading(true);
       try {
         await axios.post(`http://localhost:8080/api/users/${userId}/buyStock`, {
-          stockName: stock.stockName,
+          stockName: stock.stock_name,
           ticker: stock.ticker,
           price: stock.price,
           quantity,
         });
         setFunds(funds - totalCost);
-        alert(`You bought ${quantity} of ${stock.name} for $${totalCost.toFixed(2)}`);
+        toast.success(
+          `You bought ${quantity} of ${stock.name} for $${totalCost.toFixed(2)}`
+        );
       } catch (error) {
         console.error("Error buying stock:", error);
-        alert("Failed to complete the transaction.");
+        toast.error("Failed to complete the purchase.");
       } finally {
         setLoading(false);
       }
     } else {
-      alert("Not enough funds to complete this purchase.");
+      toast.error("Not enough funds to complete this purchase.");
     }
   };
 
-  const handleSell = async (stock) => {
-    const quantity = quantities[stock.id] || 1;
-    const totalValue = stock.purchasePrice * quantity;
-    const ownedQuantity = ownedStocks.find((s) => s.id === stock.id)?.quantity || 0;
+  const handleAddToWatchlist = async (stock) => {
+    try {
+      await axios.post(`http://localhost:8080/api/users/${userId}/watchlist`, {
+        stockId: stock.id,
+      });
+      setWatchlist((prev) => [...prev, stock.id]);
+      toast.success("Stock added to watchlist!");
+    } catch (error) {
+      console.error("Error adding to watchlist:", error);
+      toast.error("Failed to add stock to watchlist.");
+    }
+  };
 
-    if (quantity > 0 && quantity <= ownedQuantity) {
+  const handleRemoveFromWatchlist = async (stockId) => {
+    try {
+      await axios.delete(
+        `http://localhost:8080/api/users/${userId}/watchlist`,
+        {
+          data: { stockId },
+        }
+      );
+      setWatchlist((prev) => prev.filter((id) => id !== stockId));
+      toast.success("Stock removed from watchlist!");
+    } catch (error) {
+      console.error("Error removing from watchlist:", error);
+      toast.error("Failed to remove stock from watchlist.");
+    }
+  };
+
+  const handleSellClick = (stock) => {
+    setSelectedStock(stock);
+    setOpenModal(true); // Open modal for quantity input
+  };
+
+  const handleSell = async () => {
+    const ownedQuantity =
+      ownedStocks.find((s) => s.id === selectedStock.id)?.quantity || 0;
+
+    // Validate the quantity input
+    if (quantityToSell > 0 && quantityToSell <= ownedQuantity) {
+      const totalValue = selectedStock.purchasePrice * quantityToSell;
+
       setLoading(true);
       try {
-        await axios.post(`http://localhost:8080/api/users/${userId}/sellStock`, {
-          stockId: stock.id,
-          quantity,
-        });
+        // Post sell request to backend
+        await axios.post(
+          `http://localhost:8080/api/users/${userId}/sellStock`,
+          {
+            stockId: selectedStock.id,
+            quantity: quantityToSell,
+          }
+        );
         setFunds(funds + totalValue);
-        alert(`You sold ${quantity} of ${stock.name} for $${totalValue.toFixed(2)}`);
+
+        const updatedPortfolio = portfolio
+          .map((stock) => {
+            if (stock.id === selectedStock.id) {
+              const updatedStock = {
+                ...stock,
+                quantity: stock.quantity - quantityToSell,
+              };
+              return updatedStock.quantity === 0 ? null : updatedStock;
+            }
+            return stock;
+          })
+          .filter(Boolean);
+
+        setPortfolio(updatedPortfolio);
+
+        toast.success(`Stock sold successfully for $${totalValue.toFixed(2)}`);
       } catch (error) {
         console.error("Error selling stock:", error);
-        alert("Failed to complete the transaction.");
+        toast.error("Failed to sell stock.");
       } finally {
         setLoading(false);
+        setOpenModal(false); // Close modal after sell
+        setQuantityToSell(0); // Reset the quantity input
       }
     } else {
-      alert("Invalid quantity for selling.");
+      alert("Invalid quantity for selling. Please enter a valid amount.");
     }
   };
 
-  const filteredStocks = isBuying
+
+  const toggleWatchlist = (stock) => {
+    if (watchlist.includes(stock.id)) {
+      handleRemoveFromWatchlist(stock.id);
+    } else {
+      handleAddToWatchlist(stock);
+    }
+  };
+
+  const filteredStocks = (isBuying || isBuying1)
     ? stocks.filter(
         (stock) =>
-          stock.stockName.toLowerCase().includes(search.toLowerCase()) &&
+          stock.stock_name.toLowerCase().includes(search.toLowerCase()) &&
           stock.price >= priceRange[0] &&
           stock.price <= priceRange[1]
       )
-    : ownedStocks.map((ownedStock) => ({
+    : portfolio.map((ownedStock) => ({
         ...ownedStock, // Keep all properties from ownedStock
-        price: generateRandomPrice(ownedStock.purchasePrice), // Simulate price fluctuation
+        price: generateRandomPrice(ownedStock.purchase_price), // Simulate price fluctuation
       }));
+      
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      {view === "cards" && (
+      {(view === "cards" && view1==="cards") && (
         <Box sx={{ display: "flex", gap: 4, justifyContent: "center", mb: 4 }}>
           <Card
             sx={{
@@ -167,8 +276,8 @@ const StocksManagementComponent = () => {
                 Buy Stocks
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Get started with buying stocks. View real-time stock prices
-                and make your investments!
+                Get started with buying stocks. View real-time stock prices and
+                make your investments!
               </Typography>
               <Button
                 variant="contained"
@@ -223,10 +332,17 @@ const StocksManagementComponent = () => {
         </Box>
       )}
 
-      {view === "stocks" && (
+      {(view === "stocks"||view1==="stocks") && (
         <>
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: "bold",
+                color: "primary.main", // Matches your theme's primary color
+                mb: 2,
+              }}
+            >
               Available Funds: ${funds.toFixed(2)}
             </Typography>
             <Box sx={{ display: "flex", gap: 2, mb: 4 }}>
@@ -238,7 +354,7 @@ const StocksManagementComponent = () => {
                 onChange={(e) => setSearch(e.target.value)}
                 fullWidth
               />
-              {isBuying && (
+              {(isBuying || isBuying1) && (
                 <>
                   <TextField
                     label="Min Price"
@@ -265,25 +381,42 @@ const StocksManagementComponent = () => {
                 </>
               )}
             </Box>
+
+            <ToastContainer />
           </Box>
 
-          {isBuying ? (
+          {(isBuying || isBuying1) ? (
             <TableContainer component={Paper} sx={{ mb: 4 }}>
               <Table>
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: 'primary.main' }}>
-                    <TableCell sx={{ color: 'white' }}><strong>Stock Name</strong></TableCell>
-                    <TableCell sx={{ color: 'white' }}><strong>Ticker</strong></TableCell>
-                    <TableCell sx={{ color: 'white' }}><strong>Price</strong></TableCell>
-                    <TableCell sx={{ color: 'white' }}><strong>Volume</strong></TableCell>
-                    <TableCell sx={{ color: 'white' }}><strong>Quantity</strong></TableCell>
-                    <TableCell sx={{ color: 'white' }}><strong>Actions</strong></TableCell>
+                  <TableRow sx={{ backgroundColor: "primary.main" }}>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Stock Name</strong>
+                    </TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Ticker</strong>
+                    </TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Price</strong>
+                    </TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Volume</strong>
+                    </TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Quantity</strong>
+                    </TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Actions</strong>
+                    </TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Watchlist</strong>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {filteredStocks.map((stock) => (
                     <TableRow key={stock.id}>
-                      <TableCell>{stock.stockName}</TableCell>
+                      <TableCell>{stock.stock_name}</TableCell>
                       <TableCell>{stock.ticker}</TableCell>
                       <TableCell>${stock.price}</TableCell>
                       <TableCell>{stock.volume}</TableCell>
@@ -312,6 +445,19 @@ const StocksManagementComponent = () => {
                           {loading ? <CircularProgress size={24} /> : "Buy"}
                         </Button>
                       </TableCell>
+                      <TableCell>
+                        <IconButton
+                          onClick={() => toggleWatchlist(stock)}
+                          color="inherit"
+                          aria-label="Add to Watchlist"
+                        >
+                          {watchlist.includes(stock.id) ? (
+                            <Star sx={{ color: "gold" }} />
+                          ) : (
+                            <StarBorder />
+                          )}
+                        </IconButton>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -321,43 +467,64 @@ const StocksManagementComponent = () => {
             <TableContainer component={Paper} sx={{ mb: 4 }}>
               <Table>
                 <TableHead>
-                  <TableRow sx={{ backgroundColor: 'primary.main' }}>
-                    <TableCell sx={{ color: 'white' }}><strong>Stock Name</strong></TableCell>
-                    <TableCell sx={{ color: 'white' }}><strong>Ticker</strong></TableCell>
-                    <TableCell sx={{ color: 'white' }}><strong>Price</strong></TableCell>
-                    <TableCell sx={{ color: 'white' }}><strong>Volume</strong></TableCell>
-                    <TableCell sx={{ color: 'white' }}><strong>Owned Quantity</strong></TableCell>
-                    <TableCell sx={{ color: 'white' }}><strong>Actions</strong></TableCell>
+                  <TableRow sx={{ backgroundColor: "primary.main" }}>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Stock Name</strong>
+                    </TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Ticker</strong>
+                    </TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Quantity</strong>
+                    </TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Purchased Price</strong>
+                    </TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Current Price</strong>
+                    </TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Total Value</strong>
+                    </TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Profit/Loss</strong>
+                    </TableCell>
+                    <TableCell sx={{ color: "white" }}>
+                      <strong>Actions</strong>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {ownedStocks.map((stock) => (
+                  {portfolio.map((stock) => (
                     <TableRow key={stock.id}>
                       <TableCell>{stock.stockName}</TableCell>
                       <TableCell>{stock.ticker}</TableCell>
-                      <TableCell>${generateRandomPrice(stock.purchasePrice)}</TableCell>
-                      <TableCell>{stock.volume}</TableCell>
+                      <TableCell>{stock.quantity}</TableCell>
+                      <TableCell>${stock.purchasePrice.toFixed(2)}</TableCell>
+                      <TableCell>${stock.currentPrice.toFixed(2)}</TableCell>
                       <TableCell>
-                        <TextField
-                          size="small"
-                          type="number"
-                          value={quantities[stock.id] || 1}
-                          onChange={(e) =>
-                            setQuantities({
-                              ...quantities,
-                              [stock.id]: Math.max(Number(e.target.value), 1),
-                            })
-                          }
-                          sx={{ width: 80 }}
-                          inputProps={{ min: 1 }}
-                        />
+                        ${(stock.currentPrice * stock.quantity).toFixed(2)}
+                      </TableCell>
+                      <TableCell
+                        style={{
+                          color:
+                            stock.currentPrice >= stock.purchasePrice
+                              ? "green"
+                              : "red",
+                        }}
+                      >
+                        $
+                        {(
+                          (stock.currentPrice - stock.purchasePrice) *
+                          stock.quantity
+                        ).toFixed(2)}
                       </TableCell>
                       <TableCell>
                         <Button
                           variant="contained"
                           color="secondary"
-                          onClick={() => handleSell(stock)}
-                          disabled={loading}
+                          onClick={() => handleSellClick(stock)}
+                          disabled={loading || stock.quantity === 0}
                         >
                           {loading ? <CircularProgress size={24} /> : "Sell"}
                         </Button>
@@ -372,15 +539,67 @@ const StocksManagementComponent = () => {
           <Button
             variant="outlined"
             color="primary"
-            onClick={() => setView("cards")}
-            sx={{ mt: 2 }}
+            onClick={handleBackClick}            sx={{ mt: 2 }}
           >
             Back
           </Button>
+
+          {/* Modal for Quantity Input */}
+          <Modal open={openModal} onClose={() => setOpenModal(false)}>
+            <Box
+              sx={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                width: 300,
+                bgcolor: "background.paper",
+                boxShadow: 24,
+                p: 4,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="h6" gutterBottom>
+                Enter Quantity to Sell
+              </Typography>
+              <TextField
+                label="Quantity"
+                type="number"
+                value={quantityToSell}
+                onChange={(e) => setQuantityToSell(Number(e.target.value))}
+                fullWidth
+                margin="normal"
+                InputProps={{
+                  inputProps: {
+                    min: 1,
+                    max: selectedStock?.quantity,
+                  },
+                }}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSell}
+                fullWidth
+              >
+                Confirm Sell
+              </Button>
+            </Box>
+          </Modal>
         </>
       )}
     </Container>
   );
+};
+
+
+StocksManagementComponent.propTypes = {
+  isBuying1: PropTypes.bool.isRequired,
+  view1: PropTypes.oneOf(["cards", "stocks"]).isRequired,
+  setIsBuying1: PropTypes.func.isRequired,
+  setView1: PropTypes.func.isRequired,
 };
 
 export default StocksManagementComponent;
