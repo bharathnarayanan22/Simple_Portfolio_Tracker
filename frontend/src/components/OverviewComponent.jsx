@@ -61,25 +61,20 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch all stocks
         const allStocksResponse = await axios.get(
           "http://localhost:8080/stocks"
         );
         const allStocks = allStocksResponse.data;
-
-        // Calculate top stocks based on volume × price
         const sortedOverallStocks = [...allStocks].sort(
           (a, b) => b.volume * b.price - a.volume * a.price
         );
         setOverallTopStocks(sortedOverallStocks.slice(0, 3));
 
-        // Fetch user portfolio
         const portfolioResponse = await axios.get(
           `http://localhost:8080/api/users/${userId}/portfolio`
         );
         const portfolioData = portfolioResponse.data;
 
-        // Match user stocks with overall stocks and calculate profit/loss
         const portfolioWithDetails = portfolioData.map((portfolioStock) => {
           const stockDetails = allStocks.find(
             (stock) => stock.ticker === portfolioStock.ticker
@@ -96,13 +91,11 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
           };
         });
 
-        // Sort user's stocks by profit/loss
         const sortedMyStocks = portfolioWithDetails.sort(
           (a, b) => b.profitLoss - a.profitLoss
         );
         setMyTopStocks(sortedMyStocks.slice(0, 3));
 
-        // Fetch recent transactions
         const transactionsResponse = await axios.get(
           `http://localhost:8080/api/users/${userId}/transactions`
         );
@@ -120,7 +113,6 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
     fetchData();
   }, []);
 
-  // Fetch Watchlist Updates
   useEffect(() => {
     const fetchWatchlistUpdates = async () => {
       try {
@@ -150,7 +142,7 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
         });
 
         setWatchlistStocks(
-          enrichedStocks.filter((stock) => stock.percentageChange < 0) // Only show stocks with price decreases
+          enrichedStocks.filter((stock) => stock.percentageChange < 0)
         );
       } catch (error) {
         setErrorWatchlist("Failed to fetch watchlist updates.");
@@ -195,7 +187,7 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
             startIcon={<PortfolioIcon />}
             onClick={onNavigateToPortfolio}
             sx={{
-              backgroundColor: "#2196F3",
+              backgroundColor: "#013d79",
               color: "#FFF",
               fontWeight: "bold",
               textTransform: "uppercase",
@@ -213,596 +205,312 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
 
       <Divider sx={{ mb: 2 }} />
 
-
-      <Grid container spacing={4}>
-        
-        {/* Overall Stocks Performance */}
-        <Grid item xs={12} md={6} lg={4}>
-          <Card
-            sx={{
-              bgcolor: "#FFFFFF", // White background for the card
-              boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
-              borderRadius: 3,
-              transition: "transform 0.3s ease, box-shadow 0.3s ease",
-              "&:hover": {
-                transform: "scale(1.05)",
-                boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
-              },
-            }}
-          >
-            {/* Upper Section */}
-            <Box
+      <Grid>
+        <Grid container spacing={5} sx={{ mb: "4%" }}>
+          {/* Overall Stocks Performance */}
+          <Grid item xs={12} sm={6}>
+            <Card
               sx={{
-                background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
-                color: "#FFFFFF", // White text color
-                padding: 3,
-                borderTopLeftRadius: 3,
-                borderTopRightRadius: 3,
+                bgcolor: "#FFFFFF", // White background for the card
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
+                borderRadius: 3,
+                transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
+                },
               }}
             >
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  fontWeight: "bold",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <TrendingUpIcon sx={{ mr: 1, fontSize: "1.5rem" }} />
-                My Top Stocks
-              </Typography>
-            </Box>
-
-            {/* Lower Section */}
-            <CardContent sx={{ padding: 3 }}>
+              {/* Upper Section */}
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: 2,
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
+                  color: "#FFFFFF", // White text color
+                  padding: 3,
+                  borderRadius: "12px 12px 0 0", // Rounded top corners
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)", // Subtle shadow for depth
+                  position: "relative", // For positioning the button
+                  overflow: "hidden", // Ensures no overflow from child elements
                 }}
               >
-                {myTopStocks.slice(0, 3).map((stock, index) => (
-                  <Box
-                    key={stock.stockId}
-                    sx={{
-                      textAlign: "center",
-                      transition: "transform 0.3s ease",
-                      "&:hover": {
-                        transform: "scale(1.1)",
-                      },
-                    }}
-                  >
-                    {/* Animated Icons with Pulse Effect */}
+                {/* Header with icon and title */}
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{
+                    fontWeight: "bold",
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: 2, // Space between title and button
+                  }}
+                >
+                  <TrendingUpIcon
+                    sx={{ mr: 1, fontSize: "1.5rem", color: "#FFD700" }}
+                  />{" "}
+                  {/* Gold icon for contrast */}
+                  Overall Top Stocks
+                </Typography>
+
+                {/* Button with hover effect */}
+                <Button
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#FFD700", // Gold button color
+                    color: "#000000", // Black text for contrast
+                    fontWeight: "bold",
+                    borderRadius: "20px", // Rounded button
+                    padding: "8px 16px",
+                    textTransform: "none", // Prevent uppercase text
+                    "&:hover": {
+                      backgroundColor: "#FFC107", // Slightly darker gold on hover
+                    },
+                    position: "absolute", // Positioned at the bottom right
+                    bottom: 16,
+                    right: 16,
+                  }}
+                >
+                  View All
+                </Button>
+              </Box>
+
+              {/* Lower Section */}
+              <CardContent sx={{ padding: 3 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
+                >
+                  {overallTopStocks.slice(0, 3).map((stock, index) => (
                     <Box
+                      key={stock.stockId}
                       sx={{
-                        fontSize: "3rem",
-                        color:
-                          index === 0
-                            ? "#FFD700" // Gold for 1st place
-                            : index === 1
-                            ? "#C0C0C0" // Silver for 2nd place
-                            : "#CD7F32", // Bronze for 3rd place
-                        animation: "pulse 1.5s infinite",
-                        "@keyframes pulse": {
-                          "0%, 100%": {
-                            transform: "scale(1)",
-                          },
-                          "50%": {
-                            transform: "scale(1.1)",
-                          },
+                        textAlign: "center",
+                        transition: "transform 0.3s ease",
+                        "&:hover": {
+                          transform: "scale(1.1)",
                         },
                       }}
                     >
-                      {index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"}
+                      {/* Animated Icons with Pulse Effect */}
+                      <Box
+                        sx={{
+                          fontSize: "3rem",
+                          color:
+                            index === 0
+                              ? "#FFD700" // Gold for 1st place
+                              : index === 1
+                              ? "#C0C0C0" // Silver for 2nd place
+                              : "#CD7F32", // Bronze for 3rd place
+                          animation: "pulse 1.5s infinite",
+                          "@keyframes pulse": {
+                            "0%, 100%": {
+                              transform: "scale(1)",
+                            },
+                            "50%": {
+                              transform: "scale(1.1)",
+                            },
+                          },
+                        }}
+                      >
+                        {index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"}
+                      </Box>
+
+                      {/* Stock Details */}
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: "#2C3E50", // Dark blue text color
+                          fontWeight: "bold",
+                          mt: 1,
+                        }}
+                      >
+                        {stock.name} ({stock.ticker})
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: stock.price >= 0 ? "#27AE60" : "#E74C3C", // Green for profit, red for loss
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {stock.price >= 0
+                          ? `+${stock.price.toFixed(2)}`
+                          : `${stock.price.toFixed(2)}`}
+                      </Typography>
                     </Box>
+                  ))}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
 
-                    {/* Stock Details */}
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        color: "#2C3E50", // Dark blue text color
-                        fontWeight: "bold",
-                        mt: 1,
-                      }}
-                    >
-                      {stock.name} ({stock.ticker})
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: stock.profitLoss >= 0 ? "#27AE60" : "#E74C3C", // Green for profit, red for loss
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {stock.profitLoss >= 0
-                        ? `+${stock.profitLoss.toFixed(2)}`
-                        : `${stock.profitLoss.toFixed(2)}`}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* My Stocks Performance */}
-        <Grid item xs={12} md={6} lg={4}>
-          <Card
-            sx={{
-              bgcolor: "#FFFFFF", // White background for the card
-              boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
-              borderRadius: 3,
-              transition: "transform 0.3s ease, box-shadow 0.3s ease",
-              "&:hover": {
-                transform: "scale(1.05)",
-                boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
-              },
-            }}
-          >
-            {/* Upper Section */}
-            <Box
+          {/* My Stocks Performance */}
+          <Grid item xs={12} sm={6}>
+            <Card
               sx={{
-                background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
-                color: "#FFFFFF", // White text color
-                padding: 3,
-                borderTopLeftRadius: 3,
-                borderTopRightRadius: 3,
+                bgcolor: "#FFFFFF", // White background for the card
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
+                borderRadius: 3,
+                transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                "&:hover": {
+                  transform: "scale(1.05)",
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
+                },
               }}
             >
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  fontWeight: "bold",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <TrendingUpIcon sx={{ mr: 1, fontSize: "1.5rem" }} />
-                My Top Stocks
-              </Typography>
-            </Box>
-
-            {/* Lower Section */}
-            <CardContent sx={{ padding: 3 }}>
+              {/* Upper Section */}
               <Box
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: 2,
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
+                  color: "#FFFFFF", // White text color
+                  padding: 3,
+                  borderTopLeftRadius: 3,
+                  borderTopRightRadius: 3,
                 }}
               >
-                {myTopStocks.slice(0, 3).map((stock, index) => (
-                  <Box
-                    key={stock.stockId}
-                    sx={{
-                      textAlign: "center",
-                      transition: "transform 0.3s ease",
-                      "&:hover": {
-                        transform: "scale(1.1)",
-                      },
-                    }}
-                  >
-                    {/* Animated Icons with Pulse Effect */}
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{
+                    fontWeight: "bold",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <TrendingUpIcon sx={{ mr: 1, fontSize: "1.5rem" }} />
+                  My Top Stocks
+                </Typography>
+              </Box>
+
+              {/* Lower Section */}
+              <CardContent sx={{ padding: 3 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
+                >
+                  {myTopStocks.slice(0, 3).map((stock, index) => (
                     <Box
+                      key={stock.stockId}
                       sx={{
-                        fontSize: "3rem",
-                        color:
-                          index === 0
-                            ? "#FFD700" // Gold for 1st place
-                            : index === 1
-                            ? "#C0C0C0" // Silver for 2nd place
-                            : "#CD7F32", // Bronze for 3rd place
-                        animation: "pulse 1.5s infinite",
-                        "@keyframes pulse": {
-                          "0%, 100%": {
-                            transform: "scale(1)",
-                          },
-                          "50%": {
-                            transform: "scale(1.1)",
-                          },
+                        textAlign: "center",
+                        transition: "transform 0.3s ease",
+                        "&:hover": {
+                          transform: "scale(1.1)",
                         },
                       }}
                     >
-                      {index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"}
-                    </Box>
+                      {/* Animated Icons with Pulse Effect */}
+                      <Box
+                        sx={{
+                          fontSize: "3rem",
+                          color:
+                            index === 0
+                              ? "#FFD700" // Gold for 1st place
+                              : index === 1
+                              ? "#C0C0C0" // Silver for 2nd place
+                              : "#CD7F32", // Bronze for 3rd place
+                          animation: "pulse 1.5s infinite",
+                          "@keyframes pulse": {
+                            "0%, 100%": {
+                              transform: "scale(1)",
+                            },
+                            "50%": {
+                              transform: "scale(1.1)",
+                            },
+                          },
+                        }}
+                      >
+                        {index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"}
+                      </Box>
 
-                    {/* Stock Details */}
-                    <Typography
-                      variant="body1"
-                      sx={{
-                        color: "#2C3E50", // Dark blue text color
-                        fontWeight: "bold",
-                        mt: 1,
-                      }}
-                    >
-                      {stock.name} ({stock.ticker})
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: stock.profitLoss >= 0 ? "#27AE60" : "#E74C3C", // Green for profit, red for loss
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {stock.profitLoss >= 0
-                        ? `+${stock.profitLoss.toFixed(2)}`
-                        : `${stock.profitLoss.toFixed(2)}`}
-                    </Typography>
-                  </Box>
-                ))}
+                      {/* Stock Details */}
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: "#2C3E50", // Dark blue text color
+                          fontWeight: "bold",
+                          mt: 1,
+                        }}
+                      >
+                        {stock.name} ({stock.ticker})
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: stock.profitLoss >= 0 ? "#27AE60" : "#E74C3C", // Green for profit, red for loss
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {stock.profitLoss >= 0
+                          ? `+${stock.profitLoss.toFixed(2)}`
+                          : `${stock.profitLoss.toFixed(2)}`}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Recent Transactions */}
+          <Grid item xs={12} sm={6}>
+            <Card
+              sx={{
+                bgcolor: "#FFFFFF", // White background for the card
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
+                borderRadius: 3,
+                transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                "&:hover": {
+                  transform: "scale(1.02)",
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
+                },
+              }}
+            >
+              {/* Upper Section */}
+              <Box
+                sx={{
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
+                  color: "#FFFFFF", // White text color
+                  padding: 3,
+                  borderTopLeftRadius: 3,
+                  borderTopRightRadius: 3,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{
+                    fontWeight: "bold",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <ReceiptIcon sx={{ mr: 1, fontSize: "1.5rem" }} />{" "}
+                  {/* Icon for transactions */}
+                  Recent Transactions
+                </Typography>
               </Box>
-            </CardContent>
-          </Card>
-        </Grid>
 
-        {/* Recent Transactions */}
-        <Grid item xs={12} md={6} lg={4}>
-          <Card
-            sx={{
-              bgcolor: "#FFFFFF", // White background for the card
-              boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
-              borderRadius: 3,
-              transition: "transform 0.3s ease, box-shadow 0.3s ease",
-              "&:hover": {
-                transform: "scale(1.02)",
-                boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
-              },
-            }}
-          >
-            {/* Upper Section */}
-            <Box
-              sx={{
-                background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
-                color: "#FFFFFF", // White text color
-                padding: 3,
-                borderTopLeftRadius: 3,
-                borderTopRightRadius: 3,
-              }}
-            >
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  fontWeight: "bold",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <ReceiptIcon sx={{ mr: 1, fontSize: "1.5rem" }} />{" "}
-                {/* Icon for transactions */}
-                Recent Transactions
-              </Typography>
-            </Box>
-
-            {/* Lower Section */}
-            <CardContent sx={{ padding: 3 }}>
-              <List>
-                {recentTransactions.map((transaction, index) => (
-                  <ListItem
-                    key={index}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      mb: 2,
-                      padding: 2,
-                      borderRadius: 2,
-                      backgroundColor: "#F5F5F5", // Light gray background for each transaction
-                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                      "&:hover": {
-                        transform: "translateX(10px)", // Slide effect on hover
-                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // Shadow on hover
-                      },
-                    }}
-                  >
-                    {/* Transaction Icon */}
-                    <Box
-                      sx={{
-                        bgcolor:
-                          transaction.action === "Buy" ? "#27AE60" : "#E74C3C", // Green for Buy, Red for Sell
-                        color: "#FFFFFF",
-                        borderRadius: "50%",
-                        width: 40,
-                        height: 40,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mr: 2,
-                      }}
-                    >
-                      {transaction.action === "Buy" ? (
-                        <ShoppingCartIcon fontSize="small" />
-                      ) : (
-                        <SellIcon fontSize="small" />
-                      )}
-                    </Box>
-
-                    {/* Transaction Details */}
-                    <ListItemText
-                      primary={
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            fontWeight: "bold",
-                            color: "#2C3E50", // Dark blue text color
-                          }}
-                        >
-                          {transaction.action} {transaction.quantity} shares of{" "}
-                          {transaction.ticker}
-                        </Typography>
-                      }
-                      secondary={
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: "#7F8C8D", // Gray text color for secondary info
-                          }}
-                        >
-                          Date:{" "}
-                          {new Date(transaction.date).toLocaleDateString()}
-                        </Typography>
-                      }
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            </CardContent>
-          </Card>
-        </Grid>
-        
-
-        {/* News Section */}
-        <Grid item xs={12}>
-          <Card
-            sx={{
-              bgcolor: "#FFFFFF", // White background for the card
-              boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
-              borderRadius: 3,
-              transition: "transform 0.3s ease, box-shadow 0.3s ease",
-              "&:hover": {
-                transform: "scale(1.02)",
-                boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
-              },
-            }}
-          >
-            {/* Upper Section */}
-            <Box
-              sx={{
-                background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
-                color: "#FFFFFF", // White text color
-                padding: 3,
-                borderTopLeftRadius: 3,
-                borderTopRightRadius: 3,
-              }}
-            >
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  fontWeight: "bold",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <NewspaperIcon sx={{ mr: 1, fontSize: "1.5rem" }} />{" "}
-                {/* Icon for news */}
-                News
-              </Typography>
-            </Box>
-
-            {/* Lower Section */}
-            <CardContent sx={{ padding: 3 }}>
-              <List>
-                {mockNews.map((newsItem, index) => (
-                  <ListItem
-                    key={index}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      mb: 2,
-                      padding: 2,
-                      borderRadius: 2,
-                      backgroundColor: "#F5F5F5", // Light gray background for each news item
-                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                      "&:hover": {
-                        transform: "translateX(10px)", // Slide effect on hover
-                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // Shadow on hover
-                      },
-                    }}
-                  >
-                    {/* News Icon */}
-                    <Box
-                      sx={{
-                        bgcolor: "#2196F3", // Blue background for news
-                        color: "#FFFFFF",
-                        borderRadius: "50%",
-                        width: 40,
-                        height: 40,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mr: 2,
-                      }}
-                    >
-                      <NewspaperIcon fontSize="small" /> {/* Icon for news */}
-                    </Box>
-
-                    {/* News Details */}
-                    <ListItemText
-                      primary={
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            fontWeight: "bold",
-                            color: "#2C3E50", // Dark blue text color
-                          }}
-                        >
-                          {newsItem}
-                        </Typography>
-                      }
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Notifications */}
-        <Grid item xs={12} md={6} lg={4}>
-          <Card
-            sx={{
-              bgcolor: "#FFFFFF", // White background for the card
-              boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
-              borderRadius: 3,
-              transition: "transform 0.3s ease, box-shadow 0.3s ease",
-              "&:hover": {
-                transform: "scale(1.02)",
-                boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
-              },
-            }}
-          >
-            {/* Upper Section */}
-            <Box
-              sx={{
-                background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
-                color: "#FFFFFF", // White text color
-                padding: 3,
-                borderTopLeftRadius: 3,
-                borderTopRightRadius: 3,
-              }}
-            >
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  fontWeight: "bold",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <NotificationsIcon sx={{ mr: 1, fontSize: "1.5rem" }} />{" "}
-                {/* Icon for notifications */}
-                Notifications
-              </Typography>
-            </Box>
-
-            {/* Lower Section */}
-            <CardContent sx={{ padding: 3 }}>
-              <List>
-                {mockNotifications.map((notification, index) => (
-                  <ListItem
-                    key={index}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      mb: 2,
-                      padding: 2,
-                      borderRadius: 2,
-                      backgroundColor: "#F5F5F5", // Light gray background for each notification
-                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                      "&:hover": {
-                        transform: "translateX(10px)", // Slide effect on hover
-                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // Shadow on hover
-                      },
-                    }}
-                  >
-                    {/* Notification Icon */}
-                    <Box
-                      sx={{
-                        bgcolor: "#FFC107", // Orange background for notifications
-                        color: "#FFFFFF",
-                        borderRadius: "50%",
-                        width: 40,
-                        height: 40,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        mr: 2,
-                      }}
-                    >
-                      <NotificationsIcon fontSize="small" />{" "}
-                      {/* Icon for notifications */}
-                    </Box>
-
-                    {/* Notification Details */}
-                    <ListItemText
-                      primary={
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            fontWeight: "bold",
-                            color: "#2C3E50", // Dark blue text color
-                          }}
-                        >
-                          {notification}
-                        </Typography>
-                      }
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            </CardContent>
-          </Card>
-        </Grid>
-
-        {/* Watchlist Updates */}
-        <Grid item xs={12} md={6} lg={4}>
-          <Card
-            sx={{
-              bgcolor: "#FFFFFF", // White background for the card
-              boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
-              borderRadius: 3,
-              transition: "transform 0.3s ease, box-shadow 0.3s ease",
-              "&:hover": {
-                transform: "scale(1.02)",
-                boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
-              },
-            }}
-          >
-            {/* Upper Section */}
-            <Box
-              sx={{
-                background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
-                color: "#FFFFFF", // White text color
-                padding: 3,
-                borderTopLeftRadius: 3,
-                borderTopRightRadius: 3,
-              }}
-            >
-              <Typography
-                variant="h6"
-                gutterBottom
-                sx={{
-                  fontWeight: "bold",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <VisibilityIcon sx={{ mr: 1, fontSize: "1.5rem" }} />{" "}
-                {/* Icon for watchlist */}
-                Watchlist Updates
-              </Typography>
-            </Box>
-
-            {/* Lower Section */}
-            <CardContent sx={{ padding: 3 }}>
-              {watchlistStocks.length > 0 ? (
+              {/* Lower Section */}
+              <CardContent sx={{ padding: 3 }}>
                 <List>
-                  {watchlistStocks.map((stock) => (
+                  {recentTransactions.map((transaction, index) => (
                     <ListItem
-                      key={stock.id}
+                      key={index}
                       sx={{
                         display: "flex",
                         alignItems: "center",
                         mb: 2,
                         padding: 2,
                         borderRadius: 2,
-                        backgroundColor: "#F5F5F5", // Light gray background for each stock
+                        backgroundColor: "#F5F5F5", // Light gray background for each transaction
                         transition: "transform 0.3s ease, box-shadow 0.3s ease",
                         "&:hover": {
                           transform: "translateX(10px)", // Slide effect on hover
@@ -810,10 +518,13 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
                         },
                       }}
                     >
-                      {/* Stock Icon */}
+                      {/* Transaction Icon */}
                       <Box
                         sx={{
-                          bgcolor: "#E74C3C", // Red background for price decrease
+                          bgcolor:
+                            transaction.action === "Buy"
+                              ? "#27AE60"
+                              : "#E74C3C", // Green for Buy, Red for Sell
                           color: "#FFFFFF",
                           borderRadius: "50%",
                           width: 40,
@@ -824,11 +535,14 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
                           mr: 2,
                         }}
                       >
-                        <TrendingDownIcon fontSize="small" />{" "}
-                        {/* Icon for price decrease */}
+                        {transaction.action === "Buy" ? (
+                          <ShoppingCartIcon fontSize="small" />
+                        ) : (
+                          <SellIcon fontSize="small" />
+                        )}
                       </Box>
 
-                      {/* Stock Details */}
+                      {/* Transaction Details */}
                       <ListItemText
                         primary={
                           <Typography
@@ -838,7 +552,8 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
                               color: "#2C3E50", // Dark blue text color
                             }}
                           >
-                            {stock.stock_name} ({stock.ticker})
+                            {transaction.action} {transaction.quantity} shares
+                            of {transaction.ticker}
                           </Typography>
                         }
                         secondary={
@@ -848,30 +563,340 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
                               color: "#7F8C8D", // Gray text color for secondary info
                             }}
                           >
-                            Price Decrease: {Math.abs(stock.percentageChange)}%
+                            Date:{" "}
+                            {new Date(transaction.date).toLocaleDateString()}
                           </Typography>
                         }
                       />
                     </ListItem>
                   ))}
                 </List>
-              ) : (
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* News Section */}
+          <Grid item xs={12} sm={6}>
+            <Card
+              sx={{
+                bgcolor: "#FFFFFF", // White background for the card
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
+                borderRadius: 3,
+                transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                "&:hover": {
+                  transform: "scale(1.02)",
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
+                },
+              }}
+            >
+              {/* Upper Section */}
+              <Box
+                sx={{
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
+                  color: "#FFFFFF", // White text color
+                  padding: 3,
+                  borderTopLeftRadius: 3,
+                  borderTopRightRadius: 3,
+                }}
+              >
                 <Typography
-                  variant="body1"
+                  variant="h6"
+                  gutterBottom
                   sx={{
-                    color: "#7F8C8D", // Gray text color
-                    textAlign: "center",
-                    mt: 2,
+                    fontWeight: "bold",
+                    display: "flex",
+                    alignItems: "center",
                   }}
                 >
-                  No stocks with a price decrease.
+                  <NotificationsIcon sx={{ mr: 1, fontSize: "1.5rem" }} />{" "}
+                  {/* Icon for notifications */}
+                  Notifications
                 </Typography>
-              )}
-            </CardContent>
-          </Card>
+              </Box>
+
+              {/* Lower Section */}
+              <CardContent sx={{ padding: 3 }}>
+                <List>
+                  {mockNotifications.map((notification, index) => (
+                    <ListItem
+                      key={index}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        mb: 2,
+                        padding: 2,
+                        borderRadius: 2,
+                        backgroundColor: "#F5F5F5", // Light gray background for each notification
+                        transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                        "&:hover": {
+                          transform: "translateX(10px)", // Slide effect on hover
+                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // Shadow on hover
+                        },
+                      }}
+                    >
+                      {/* Notification Icon */}
+                      <Box
+                        sx={{
+                          bgcolor: "#FFC107", // Orange background for notifications
+                          color: "#FFFFFF",
+                          borderRadius: "50%",
+                          width: 40,
+                          height: 40,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          mr: 2,
+                        }}
+                      >
+                        <NotificationsIcon fontSize="small" />{" "}
+                        {/* Icon for notifications */}
+                      </Box>
+
+                      {/* Notification Details */}
+                      <ListItemText
+                        primary={
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              fontWeight: "bold",
+                              color: "#2C3E50", // Dark blue text color
+                            }}
+                          >
+                            {notification}
+                          </Typography>
+                        }
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+
+        <Grid container spacing={4}>
+          {/* Notifications */}
+
+          <Grid item xs={12}>
+            <Card
+              sx={{
+                bgcolor: "#FFFFFF", // White background for the card
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
+                borderRadius: 3,
+                transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                "&:hover": {
+                  transform: "scale(1.02)",
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
+                },
+              }}
+            >
+              {/* Upper Section */}
+              <Box
+                sx={{
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
+                  color: "#FFFFFF", // White text color
+                  padding: 3,
+                  borderTopLeftRadius: 3,
+                  borderTopRightRadius: 3,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{
+                    fontWeight: "bold",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <NewspaperIcon sx={{ mr: 1, fontSize: "1.5rem" }} />{" "}
+                  {/* Icon for news */}
+                  News
+                </Typography>
+              </Box>
+
+              {/* Lower Section */}
+              <CardContent sx={{ padding: 3 }}>
+                <List>
+                  {mockNews.map((newsItem, index) => (
+                    <ListItem
+                      key={index}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        mb: 2,
+                        padding: 2,
+                        borderRadius: 2,
+                        backgroundColor: "#F5F5F5", // Light gray background for each news item
+                        transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                        "&:hover": {
+                          transform: "translateX(10px)", // Slide effect on hover
+                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // Shadow on hover
+                        },
+                      }}
+                    >
+                      {/* News Icon */}
+                      <Box
+                        sx={{
+                          bgcolor: "#2196F3", // Blue background for news
+                          color: "#FFFFFF",
+                          borderRadius: "50%",
+                          width: 40,
+                          height: 40,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          mr: 2,
+                        }}
+                      >
+                        <NewspaperIcon fontSize="small" /> {/* Icon for news */}
+                      </Box>
+
+                      {/* News Details */}
+                      <ListItemText
+                        primary={
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              fontWeight: "bold",
+                              color: "#2C3E50", // Dark blue text color
+                            }}
+                          >
+                            {newsItem}
+                          </Typography>
+                        }
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Watchlist Updates */}
+          <Grid item xs={12}>
+            <Card
+              sx={{
+                bgcolor: "#FFFFFF", // White background for the card
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
+                borderRadius: 3,
+                transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                "&:hover": {
+                  transform: "scale(1.02)",
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
+                },
+              }}
+            >
+              {/* Upper Section */}
+              <Box
+                sx={{
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
+                  color: "#FFFFFF", // White text color
+                  padding: 3,
+                  borderTopLeftRadius: 3,
+                  borderTopRightRadius: 3,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  sx={{
+                    fontWeight: "bold",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <VisibilityIcon sx={{ mr: 1, fontSize: "1.5rem" }} />{" "}
+                  {/* Icon for watchlist */}
+                  Watchlist Updates
+                </Typography>
+              </Box>
+
+              {/* Lower Section */}
+              <CardContent sx={{ padding: 3 }}>
+                {watchlistStocks.length > 0 ? (
+                  <List>
+                    {watchlistStocks.map((stock) => (
+                      <ListItem
+                        key={stock.id}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          mb: 2,
+                          padding: 2,
+                          borderRadius: 2,
+                          backgroundColor: "#F5F5F5", // Light gray background for each stock
+                          transition:
+                            "transform 0.3s ease, box-shadow 0.3s ease",
+                          "&:hover": {
+                            transform: "translateX(10px)", // Slide effect on hover
+                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // Shadow on hover
+                          },
+                        }}
+                      >
+                        {/* Stock Icon */}
+                        <Box
+                          sx={{
+                            bgcolor: "#E74C3C", // Red background for price decrease
+                            color: "#FFFFFF",
+                            borderRadius: "50%",
+                            width: 40,
+                            height: 40,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            mr: 2,
+                          }}
+                        >
+                          <TrendingDownIcon fontSize="small" />{" "}
+                          {/* Icon for price decrease */}
+                        </Box>
+
+                        {/* Stock Details */}
+                        <ListItemText
+                          primary={
+                            <Typography
+                              variant="body1"
+                              sx={{
+                                fontWeight: "bold",
+                                color: "#2C3E50", // Dark blue text color
+                              }}
+                            >
+                              {stock.stock_name} ({stock.ticker})
+                            </Typography>
+                          }
+                          secondary={
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: "#7F8C8D", // Gray text color for secondary info
+                              }}
+                            >
+                              Price Decrease: {Math.abs(stock.percentageChange)}
+                              %
+                            </Typography>
+                          }
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                ) : (
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: "#7F8C8D", // Gray text color
+                      textAlign: "center",
+                      mt: 2,
+                    }}
+                  >
+                    No stocks with a price decrease.
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
       </Grid>
-
     </Box>
   );
 };

@@ -242,15 +242,6 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
     });
   };
 
-  // const calculateSectorData = (data) => {
-  //   const sectors = data.reduce((acc, stock) => {
-  //     acc[stock.sector] =
-  //       (acc[stock.sector] || 0) + stock.currentPrice * stock.quantity;
-  //     return acc;
-  //   }, {});
-  //   setSectorData(sectors);
-  // };
-
   const calculateDividendData = (data) => {
     const dividends = data.reduce((acc, stock) => {
       acc[stock.stockName] =
@@ -265,7 +256,6 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
     setPage(newPage);
   };
 
-  // Handle rows per page change
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
@@ -279,7 +269,7 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
   const chartData = {
     labels: timelineData.map((entry) =>
       format(new Date(entry.date), "dd-MM-yyyy")
-    ), // Format the date
+    ), 
     datasets: [
       {
         label: "Portfolio Value Over Time",
@@ -290,6 +280,36 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
     ],
   };
 
+  const handleExport = () => {
+    if (!portfolio.length) {
+      console.warn("No portfolio data to export.");
+      return;
+    }
+  
+    // Convert portfolio data to CSV format
+    const csvHeaders = "Ticker,Stock Name,Quantity,Purchase Price,Current Price,Total Value\n";
+    const csvRows = portfolio.map((stock) => 
+      `${stock.ticker},${stock.stockName},${stock.quantity},${stock.purchasePrice},${stock.currentPrice},${(stock.quantity * stock.currentPrice).toFixed(2)}`
+    );
+    const csvContent = [csvHeaders, ...csvRows].join("\n");
+  
+    // Create a Blob and trigger download
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+  
+    // Create a temporary anchor element to trigger the download
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `portfolio_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+  
+    // Clean up
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+  
+
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -297,7 +317,7 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
         onBuyClick={onBuyClick}
         onSellClick={onSellClick}
         onWatchlistClick={onWatchlistClick}
-        onExportClick={onExportClick} />
+        onExportClick={handleExport} />
 
       {loading ? (
         <CircularProgress />

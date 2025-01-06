@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { styled, ThemeProvider, createTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
+import {
+  useTheme,
+} from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
 import MuiAppBar from "@mui/material/AppBar";
@@ -56,6 +59,7 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
+  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`, // Apply gradient here
   ...(open && {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: `${drawerWidth}px`,
@@ -74,16 +78,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-end",
 }));
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#013d79",
-    },
-    secondary: {
-      main: "#013d79",
-    },
-  },
-});
 
 export default function PortfolioTrackerDashboard() {
   const [open, setOpen] = useState(false);
@@ -92,6 +86,7 @@ export default function PortfolioTrackerDashboard() {
   const [view1, setView1] = useState("cards");
 
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -107,7 +102,7 @@ export default function PortfolioTrackerDashboard() {
 
   const handleHomeClick = () => {
     localStorage.removeItem("token");
-    navigate("/register");
+    navigate("/");
   };
 
   const handleBuyClick = () => {
@@ -160,7 +155,7 @@ export default function PortfolioTrackerDashboard() {
             </Typography>
             <Box sx={{ flexGrow: 1 }} />
             <AccountCircleIcon sx={{ marginRight: 1 }} />
-            <Typography>{userName}</Typography>
+            <Typography sx={{color:"white"}}>{userName}</Typography>
           </Toolbar>
         </AppBar>
         <Drawer

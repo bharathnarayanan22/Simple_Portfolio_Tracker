@@ -6,13 +6,23 @@ import {
   Typography,
   Button,
   Box,
+  useTheme,
   IconButton,
+  Menu,
+  MenuItem,
+  Fade,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LogoutIcon from "@mui/icons-material/Logout";
+import DashboardIcon from "@mui/icons-material/Dashboard";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const theme = useTheme();
+  const open = Boolean(anchorEl);
 
   // Check for token in local storage
   useEffect(() => {
@@ -28,54 +38,146 @@ const Navbar = () => {
     navigate("/");
   };
 
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   return (
-    <AppBar position="static" color="primary">
+    <AppBar
+      position="static"
+      sx={{
+        background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+        animation: "gradientAnimation 10s ease infinite",
+        "@keyframes gradientAnimation": {
+          "0%": {
+            backgroundPosition: "0% 50%",
+          },
+          "50%": {
+            backgroundPosition: "100% 50%",
+          },
+          "100%": {
+            backgroundPosition: "0% 50%",
+          },
+        },
+      }}
+    >
       <Toolbar>
-        {/* Logo Section */}
-        
+        {/* Add your logo here */}
+        <img
+          src="/src/assets/logo.png"
+          alt="Logo"
+          style={{ width: "40px", height: "40px", marginRight: "10px" }} 
+        />
         <Typography
-          variant="h6"
+          variant="h5"
           component="div"
-          sx={{ flexGrow: 1, cursor: "pointer" }}
-          onClick={() => navigate("/")}
+          sx={{
+            flexGrow: 1,
+            fontFamily: "Poppins, sans-serif",
+            fontWeight: 600,
+            letterSpacing: "1px",
+            transition: "transform 0.3s ease",
+            "&:hover": {
+              textUnderlinePosition: "underline",
+            },
+          }}
         >
           Portfolio Tracker
         </Typography>
 
         {/* Navigation Links */}
         {!isLoggedIn ? (
-          <>
-            <Button
-              color="inherit"
-              onClick={() => navigate("/login")}
-              sx={{ mx: 1 }}
-            >
-              Login
-            </Button>
-            <Button
-              color="inherit"
-              onClick={() => navigate("/register")}
-              sx={{ mx: 1 }}
-            >
-              Register
-            </Button>
-          </>
+          <Button
+            color="inherit"
+            onClick={() => navigate("/register")}
+            sx={{
+              mx: 1,
+              fontWeight: 600,
+              "&:hover": {
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+              },
+            }}
+          >
+            Login / Register
+          </Button>
         ) : (
           <>
-            <Button
-              color="inherit"
-              onClick={() => navigate("/dashboard")}
-              sx={{ mx: 1 }}
+            {/* Desktop Menu */}
+            <Box
+              sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}
             >
-              Dashboard
-            </Button>
-            <Button
-              color="inherit"
-              onClick={handleLogout}
-              sx={{ mx: 1 }}
-            >
-              Logout
-            </Button>
+              <Button
+                color="inherit"
+                onClick={() => navigate("/dashboard")}
+                sx={{
+                  mx: 1,
+                  fontWeight: 600,
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  },
+                }}
+                startIcon={<DashboardIcon />}
+              >
+                Dashboard
+              </Button>
+              <Button
+                color="inherit"
+                onClick={handleLogout}
+                sx={{
+                  mx: 1,
+                  fontWeight: 600,
+                  "&:hover": {
+                    backgroundColor: "rgba(255, 255, 255, 0.1)",
+                  },
+                }}
+                startIcon={<LogoutIcon />}
+              >
+                Logout
+              </Button>
+            </Box>
+
+            {/* Mobile Menu */}
+            <Box sx={{ display: { xs: "flex", md: "none" } }}>
+              <IconButton
+                size="large"
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                onClick={handleMenuClick}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                id="fade-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleMenuClose}
+                TransitionComponent={Fade}
+              >
+                <MenuItem
+                  onClick={() => {
+                    navigate("/dashboard");
+                    handleMenuClose();
+                  }}
+                >
+                  <DashboardIcon sx={{ mr: 1 }} />
+                  Dashboard
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    handleLogout();
+                    handleMenuClose();
+                  }}
+                >
+                  <LogoutIcon sx={{ mr: 1 }} />
+                  Logout
+                </MenuItem>
+              </Menu>
+            </Box>
           </>
         )}
       </Toolbar>

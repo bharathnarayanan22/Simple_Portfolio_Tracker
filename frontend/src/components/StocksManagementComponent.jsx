@@ -20,7 +20,9 @@ import {
   Modal,
 } from "@mui/material";
 import { Star, StarBorder } from "@mui/icons-material";
-
+import SearchIcon from "@mui/icons-material/Search";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import axios from "axios";
 import PropTypes from "prop-types";
 
@@ -32,10 +34,14 @@ const generateRandomPrice = (basePrice) => {
   return Math.max(basePrice + fluctuation, 1);
 };
 
-
-const StocksManagementComponent = ({ isBuying1, view1, setIsBuying1, setView1 }) => {
-  const [isBuying, setIsBuying] = useState(false); 
-  const [view, setView] = useState("cards"); 
+const StocksManagementComponent = ({
+  isBuying1,
+  view1,
+  setIsBuying1,
+  setView1,
+}) => {
+  const [isBuying, setIsBuying] = useState(false);
+  const [view, setView] = useState("cards");
   const [stocks, setStocks] = useState([]);
   const [ownedStocks, setOwnedStocks] = useState([]);
   const [watchlist, setWatchlist] = useState([]);
@@ -50,11 +56,10 @@ const StocksManagementComponent = ({ isBuying1, view1, setIsBuying1, setView1 })
   const [quantityToSell, setQuantityToSell] = useState(0);
   const [selectedStock, setSelectedStock] = useState(null);
 
-
   const handleBackClick = () => {
-    setIsBuying1(false); 
-    setView1("cards"); 
-    setView("cards"); 
+    setIsBuying1(false);
+    setView1("cards");
+    setView("cards");
   };
 
   useEffect(() => {
@@ -103,7 +108,7 @@ const StocksManagementComponent = ({ isBuying1, view1, setIsBuying1, setView1 })
     };
 
     fetchData();
-  }, [userId]);
+  }, [funds, userId]);
 
   useEffect(() => {
     // Update stock prices every 5 seconds
@@ -230,7 +235,6 @@ const StocksManagementComponent = ({ isBuying1, view1, setIsBuying1, setView1 })
     }
   };
 
-
   const toggleWatchlist = (stock) => {
     if (watchlist.includes(stock.id)) {
       handleRemoveFromWatchlist(stock.id);
@@ -239,23 +243,23 @@ const StocksManagementComponent = ({ isBuying1, view1, setIsBuying1, setView1 })
     }
   };
 
-  const filteredStocks = (isBuying || isBuying1)
-    ? stocks.filter(
-        (stock) =>
-          stock.stock_name.toLowerCase().includes(search.toLowerCase()) &&
-          stock.price >= priceRange[0] &&
-          stock.price <= priceRange[1]
-      )
-    : portfolio.map((ownedStock) => ({
-        ...ownedStock, // Keep all properties from ownedStock
-        price: generateRandomPrice(ownedStock.purchase_price), // Simulate price fluctuation
-      }));
-      
+  const filteredStocks =
+    isBuying || isBuying1
+      ? stocks.filter(
+          (stock) =>
+            stock.stock_name.toLowerCase().includes(search.toLowerCase()) &&
+            stock.price >= priceRange[0] &&
+            stock.price <= priceRange[1]
+        )
+      : portfolio.map((ownedStock) => ({
+          ...ownedStock, // Keep all properties from ownedStock
+          price: generateRandomPrice(ownedStock.purchase_price), // Simulate price fluctuation
+        }));
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      {(view === "cards" && view1==="cards") && (
-        <Box sx={{ display: "flex", gap: 4, justifyContent: "center", mb: 4 }}>
+      {view === "cards" && view1 === "cards" && (
+        <Box sx={{ display: "flex", gap: 4, justifyContent: "center", mt: 8 }}>
           <Card
             sx={{
               width: "45%",
@@ -332,7 +336,7 @@ const StocksManagementComponent = ({ isBuying1, view1, setIsBuying1, setView1 })
         </Box>
       )}
 
-      {(view === "stocks"||view1==="stocks") && (
+      {(view === "stocks" || view1 === "stocks") && (
         <>
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
             <Typography
@@ -385,7 +389,7 @@ const StocksManagementComponent = ({ isBuying1, view1, setIsBuying1, setView1 })
             <ToastContainer />
           </Box>
 
-          {(isBuying || isBuying1) ? (
+          {isBuying || isBuying1 ? (
             <TableContainer component={Paper} sx={{ mb: 4 }}>
               <Table>
                 <TableHead>
@@ -415,7 +419,20 @@ const StocksManagementComponent = ({ isBuying1, view1, setIsBuying1, setView1 })
                 </TableHead>
                 <TableBody>
                   {filteredStocks.map((stock) => (
-                    <TableRow key={stock.id}>
+                    <TableRow
+                      key={stock.id}
+                      sx={{
+                        "&:nth-of-type(odd)": {
+                          backgroundColor: (theme) =>
+                            theme.palette.action.hover,
+                        },
+                        "&:hover": {
+                          backgroundColor: (theme) =>
+                            theme.palette.action.selected,
+                          cursor: "pointer",
+                        },
+                      }}
+                    >
                       <TableCell>{stock.stock_name}</TableCell>
                       <TableCell>{stock.ticker}</TableCell>
                       <TableCell>${stock.price}</TableCell>
@@ -496,7 +513,20 @@ const StocksManagementComponent = ({ isBuying1, view1, setIsBuying1, setView1 })
                 </TableHead>
                 <TableBody>
                   {portfolio.map((stock) => (
-                    <TableRow key={stock.id}>
+                    <TableRow
+                      key={stock.id}
+                      sx={{
+                        "&:nth-of-type(odd)": {
+                          backgroundColor: (theme) =>
+                            theme.palette.action.hover,
+                        },
+                        "&:hover": {
+                          backgroundColor: (theme) =>
+                            theme.palette.action.selected,
+                          cursor: "pointer",
+                        },
+                      }}
+                    >
                       <TableCell>{stock.stockName}</TableCell>
                       <TableCell>{stock.ticker}</TableCell>
                       <TableCell>{stock.quantity}</TableCell>
@@ -539,7 +569,8 @@ const StocksManagementComponent = ({ isBuying1, view1, setIsBuying1, setView1 })
           <Button
             variant="outlined"
             color="primary"
-            onClick={handleBackClick}            sx={{ mt: 2 }}
+            onClick={handleBackClick}
+            sx={{ mt: 2 }}
           >
             Back
           </Button>
@@ -593,7 +624,6 @@ const StocksManagementComponent = ({ isBuying1, view1, setIsBuying1, setView1 })
     </Container>
   );
 };
-
 
 StocksManagementComponent.propTypes = {
   isBuying1: PropTypes.bool.isRequired,
