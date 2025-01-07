@@ -22,7 +22,8 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import SellIcon from "@mui/icons-material/Sell";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
-import NewspaperIcon from "@mui/icons-material/Newspaper"; // Icon for news
+import NewspaperIcon from "@mui/icons-material/Newspaper";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import PropTypes from "prop-types";
 import axios from "axios";
 
@@ -38,7 +39,7 @@ const scaleUp = keyframes`
   }
 `;
 
-const OverviewComponent = ({ onNavigateToPortfolio }) => {
+const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNavigateToTranscations, onNavigateToWatchlistUpdate }) => {
   const [overallTopStocks, setOverallTopStocks] = useState([]);
   const [myTopStocks, setMyTopStocks] = useState([]);
   const [recentTransactions, setRecentTransactions] = useState([]);
@@ -233,7 +234,6 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
                   overflow: "hidden", // Ensures no overflow from child elements
                 }}
               >
-                {/* Header with icon and title */}
                 <Typography
                   variant="h6"
                   gutterBottom
@@ -241,36 +241,42 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
                     fontWeight: "bold",
                     display: "flex",
                     alignItems: "center",
-                    marginBottom: 2, // Space between title and button
+                    justifyContent: "space-between", // Ensures the button stays on the same line as the title
+                    marginBottom: 0, // Remove extra space below title
                   }}
                 >
-                  <TrendingUpIcon
-                    sx={{ mr: 1, fontSize: "1.5rem", color: "#FFD700" }}
-                  />{" "}
-                  {/* Gold icon for contrast */}
-                  Overall Top Stocks
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <TrendingUpIcon
+                      sx={{ mr: 1, fontSize: "1.5rem", color: "#FFD700" }}
+                    />
+                    Overall Top Stocks
+                  </Box>
+                  <Button
+                    variant="text"
+                    onClick={onNavigateToStocks}
+                    sx={{
+                      minWidth: "auto",
+                      padding: "8px 12px",
+                      color: "#FFFFFF",
+                      fontSize: "1.5rem",
+                      fontWeight: "bold",
+                      textTransform: "none",
+                      borderRadius: "8px",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        color: "#FFD700",
+                        transform: "scale(1.1)",
+                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                      },
+                      "&:active": {
+                        transform: "scale(0.95)",
+                      },
+                    }}
+                  >
+                    <ArrowForwardIcon sx={{ fontSize: "1.5rem" }} />
+                  </Button>
                 </Typography>
-
-                {/* Button with hover effect */}
-                <Button
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#FFD700", // Gold button color
-                    color: "#000000", // Black text for contrast
-                    fontWeight: "bold",
-                    borderRadius: "20px", // Rounded button
-                    padding: "8px 16px",
-                    textTransform: "none", // Prevent uppercase text
-                    "&:hover": {
-                      backgroundColor: "#FFC107", // Slightly darker gold on hover
-                    },
-                    position: "absolute", // Positioned at the bottom right
-                    bottom: 16,
-                    right: 16,
-                  }}
-                >
-                  View All
-                </Button>
               </Box>
 
               {/* Lower Section */}
@@ -378,10 +384,41 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
                     fontWeight: "bold",
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "space-between", 
+                    marginBottom: 0, 
                   }}
                 >
-                  <TrendingUpIcon sx={{ mr: 1, fontSize: "1.5rem" }} />
-                  My Top Stocks
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <TrendingUpIcon
+                      sx={{ mr: 1, fontSize: "1.5rem", color: "#FFD700" }}
+                    />
+                    My Top Stocks
+                  </Box>
+                  <Button
+                    variant="text"
+                    onClick={onNavigateToStocks}
+                    sx={{
+                      minWidth: "auto",
+                      padding: "8px 12px",
+                      color: "#FFFFFF",
+                      fontSize: "1.5rem",
+                      fontWeight: "bold",
+                      textTransform: "none",
+                      borderRadius: "8px",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        color: "#FFD700",
+                        transform: "scale(1.1)",
+                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                      },
+                      "&:active": {
+                        transform: "scale(0.95)",
+                      },
+                    }}
+                  >
+                    <ArrowForwardIcon sx={{ fontSize: "1.5rem" }} />
+                  </Button>
                 </Typography>
               </Box>
 
@@ -490,11 +527,41 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
                     fontWeight: "bold",
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "space-between", 
+                    marginBottom: 0, 
                   }}
                 >
-                  <ReceiptIcon sx={{ mr: 1, fontSize: "1.5rem" }} />{" "}
-                  {/* Icon for transactions */}
-                  Recent Transactions
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <TrendingUpIcon
+                      sx={{ mr: 1, fontSize: "1.5rem", color: "#FFD700" }}
+                    />
+                    Recent Transactions
+                  </Box>
+                  <Button
+                    variant="text"
+                    onClick={onNavigateToTranscations}
+                    sx={{
+                      minWidth: "auto",
+                      padding: "8px 12px",
+                      color: "#FFFFFF",
+                      fontSize: "1.5rem",
+                      fontWeight: "bold",
+                      textTransform: "none",
+                      borderRadius: "8px",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        color: "#FFD700",
+                        transform: "scale(1.1)",
+                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                      },
+                      "&:active": {
+                        transform: "scale(0.95)",
+                      },
+                    }}
+                  >
+                    <ArrowForwardIcon sx={{ fontSize: "1.5rem" }} />
+                  </Button>
                 </Typography>
               </Box>
 
@@ -804,11 +871,41 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
                     fontWeight: "bold",
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "space-between", 
+                    marginBottom: 0, 
                   }}
                 >
-                  <VisibilityIcon sx={{ mr: 1, fontSize: "1.5rem" }} />{" "}
-                  {/* Icon for watchlist */}
-                  Watchlist Updates
+                  <Box sx={{ display: "flex", alignItems: "center" }}>
+                    <TrendingUpIcon
+                      sx={{ mr: 1, fontSize: "1.5rem", color: "#FFD700" }}
+                    />
+                    Watchlist Updates
+                  </Box>
+                  <Button
+                    variant="text"
+                    onClick={onNavigateToWatchlistUpdate}
+                    sx={{
+                      minWidth: "auto",
+                      padding: "8px 12px",
+                      color: "#FFFFFF",
+                      fontSize: "1.5rem",
+                      fontWeight: "bold",
+                      textTransform: "none",
+                      borderRadius: "8px",
+                      transition: "all 0.3s ease",
+                      "&:hover": {
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
+                        color: "#FFD700",
+                        transform: "scale(1.1)",
+                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                      },
+                      "&:active": {
+                        transform: "scale(0.95)",
+                      },
+                    }}
+                  >
+                    <ArrowForwardIcon sx={{ fontSize: "1.5rem" }} />
+                  </Button>
                 </Typography>
               </Box>
 
@@ -903,6 +1000,9 @@ const OverviewComponent = ({ onNavigateToPortfolio }) => {
 
 OverviewComponent.propTypes = {
   onNavigateToPortfolio: PropTypes.func.isRequired,
+  onNavigateToStocks: PropTypes.func.isRequired,
+  onNavigateToWatchlistUpdate: PropTypes.func.isRequired,
+  onNavigateToTranscations: PropTypes.func.isRequired,
 };
 
 export default OverviewComponent;

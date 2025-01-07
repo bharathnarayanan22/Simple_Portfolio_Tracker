@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import { styled, ThemeProvider, createTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import {
-  useTheme,
-} from "@mui/material";
+import { useTheme } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
 import MuiAppBar from "@mui/material/AppBar";
@@ -78,7 +76,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   justifyContent: "flex-end",
 }));
 
-
 export default function PortfolioTrackerDashboard() {
   const [open, setOpen] = useState(false);
   const [selectedView, setSelectedView] = useState("Overview");
@@ -123,11 +120,18 @@ export default function PortfolioTrackerDashboard() {
 
   const handleExportClick = () => {
     console.log("Export button clicked");
-    // Add logic for exporting portfolio
   };
 
   const handlePortfolioClick = () => {
     setSelectedView("Portfolio");
+  };
+
+  const handleStockClick = () => {
+    setSelectedView("Stocks Management");
+  };
+
+  const handleTransactionClick = () => {
+    setSelectedView("Transactions");
   };
 
   const selectedStyle = {
@@ -155,7 +159,7 @@ export default function PortfolioTrackerDashboard() {
             </Typography>
             <Box sx={{ flexGrow: 1 }} />
             <AccountCircleIcon sx={{ marginRight: 1 }} />
-            <Typography sx={{color:"white"}}>{userName}</Typography>
+            <Typography sx={{ color: "white" }}>{userName}</Typography>
           </Toolbar>
         </AppBar>
         <Drawer
@@ -258,7 +262,14 @@ export default function PortfolioTrackerDashboard() {
         </Drawer>
         <Main open={open}>
           <DrawerHeader />
-          {selectedView === "Overview" && <OverviewComponent onNavigateToPortfolio={handlePortfolioClick} />}
+          {selectedView === "Overview" && (
+            <OverviewComponent
+              onNavigateToPortfolio={handlePortfolioClick}
+              onNavigateToStocks={handleStockClick}
+              onNavigateToTranscations={handleTransactionClick}
+              onNavigateToWatchlistUpdate={handleWatchlistClick}
+            />
+          )}
           {selectedView === "Stocks Management" && (
             <StocksManagementComponent
               isBuying1={isBuying1}

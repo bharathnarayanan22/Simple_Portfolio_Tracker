@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import {
@@ -14,6 +14,7 @@ import {
 import { keyframes } from "@emotion/react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
+import { AuthContext } from "../context/AuthContext.jsx";
 
 // Fade-in animation
 const fadeIn = keyframes`
@@ -28,16 +29,18 @@ const fadeIn = keyframes`
 `;
 
 const Home = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn } = useContext(AuthContext);
+
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  // Check for token in local storage
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token); // Set to true if token exists, otherwise false
-  }, []);
+  // // Check for token in local storage
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   setIsLoggedIn(!!token); // Set to true if token exists, otherwise false
+  // }, []);
 
   return (
     <Box sx={{ overflowX: "hidden" }}>
