@@ -303,7 +303,7 @@ const StocksManagementComponent = ({
               component="img"
               alt="Sell Stocks Image"
               height="200"
-              image="src/assets/sell3.webp"
+              image="src/assets/sell.webp"
             />
             <CardContent>
               <Typography gutterBottom variant="h5" component="div">

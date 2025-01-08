@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import PortfolioButtons from "./PortfolioButtons";
 import {
   Container,
+  Grid,
   Grid2,
   Card,
   CardContent,
@@ -18,6 +19,10 @@ import {
   TextField,
   TablePagination,
   Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import { Pie, Bar, Line } from "react-chartjs-2";
 import {
@@ -55,8 +60,12 @@ import { format } from "date-fns";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import PropTypes from "prop-types"; // Import PropTypes
 
-
-const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExportClick }) => {
+const PortfolioComponent = ({
+  onBuyClick,
+  onSellClick,
+  onWatchlistClick,
+  onExportClick,
+}) => {
   const [portfolio, setPortfolio] = useState([]);
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState({
@@ -72,6 +81,7 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [filter, setFilter] = useState("");
+  const [selectedStock, setSelectedStock] = useState(""); // Selected stock filter
 
   const sectorMap = {
     Tech: ["AAPL", "MSFT", "GOOG"],
@@ -105,15 +115,15 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
           if (stockDetails) {
             return {
               ...portfolioStock,
-              stockId: stockDetails.id, 
+              stockId: stockDetails.id,
               currentPrice: stockDetails.price,
               sector: stockDetails.sector || "Unknown",
-              dividendYield: Math.random() * 0.05, 
+              dividendYield: Math.random() * 0.05,
             };
           } else {
             return {
               ...portfolioStock,
-              currentPrice: portfolioStock.purchasePrice, 
+              currentPrice: portfolioStock.purchasePrice,
             };
           }
         });
@@ -122,6 +132,7 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
         setSectorData(newSectorData);
 
         const portfolioTimeline = await fetchTimelineData(matchedPortfolio);
+        console.log(portfolioTimeline);
 
         setPortfolio(matchedPortfolio);
         setTimelineData(portfolioTimeline);
@@ -147,7 +158,7 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
       const sectorData = {};
 
       portfolio.forEach((stock) => {
-        let sector = "Other"; 
+        let sector = "Other";
         for (const [key, tickers] of Object.entries(sectorMap)) {
           if (tickers.includes(stock.ticker)) {
             sector = key;
@@ -178,7 +189,7 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
           const stockPriceHistory = response.data;
 
           stockPriceHistory.forEach((priceData) => {
-            const date = priceData.timestamp; 
+            const date = priceData.timestamp;
             const valueAtDate = stock.quantity * priceData.price;
 
             const existingEntry = timelineData.find(
@@ -188,7 +199,11 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
             if (existingEntry) {
               existingEntry.value += valueAtDate;
             } else {
-              timelineData.push({ date, value: valueAtDate });
+              timelineData.push({
+                date,
+                value: valueAtDate,
+                ticker: stock.ticker, // Add ticker for filtering
+              });
             }
           });
         } catch (error) {
@@ -256,14 +271,24 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
       stock.ticker.toLowerCase().includes(filter.toLowerCase())
   );
 
+  const handleStockSelection = (event) => {
+    setSelectedStock(event.target.value);
+  };
+
+  // Filter timeline data for the selected stock
+  const filteredTimelineData =
+    selectedStock === ""
+      ? timelineData
+      : timelineData.filter((entry) => entry.ticker === selectedStock);
+
   const chartData = {
-    labels: timelineData.map((entry) =>
+    labels: filteredTimelineData.map((entry) =>
       format(new Date(entry.date), "dd-MM-yyyy")
-    ), 
+    ),
     datasets: [
       {
-        label: "Portfolio Value Over Time",
-        data: timelineData.map((entry) => entry.value),
+        label: `Portfolio Value (${selectedStock || "All Stocks"})`,
+        data: filteredTimelineData.map((entry) => entry.value),
         borderColor: "#42A5F5",
         fill: false,
       },
@@ -275,35 +300,40 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
       console.warn("No portfolio data to export.");
       return;
     }
-  
-    const csvHeaders = "Ticker,Stock Name,Quantity,Purchase Price,Current Price,Total Value\n";
-    const csvRows = portfolio.map((stock) => 
-      `${stock.ticker},${stock.stockName},${stock.quantity},${stock.purchasePrice},${stock.currentPrice},${(stock.quantity * stock.currentPrice).toFixed(2)}`
+
+    const csvHeaders =
+      "Ticker,Stock Name,Quantity,Purchase Price,Current Price,Total Value\n";
+    const csvRows = portfolio.map(
+      (stock) =>
+        `${stock.ticker},${stock.stockName},${stock.quantity},${
+          stock.purchasePrice
+        },${stock.currentPrice},${(stock.quantity * stock.currentPrice).toFixed(
+          2
+        )}`
     );
     const csvContent = [csvHeaders, ...csvRows].join("\n");
-  
+
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-  
+
     const a = document.createElement("a");
     a.href = url;
     a.download = `portfolio_${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(a);
     a.click();
-  
+
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
-  
-
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <PortfolioHeader 
+      <PortfolioHeader
         onBuyClick={onBuyClick}
         onSellClick={onSellClick}
         onWatchlistClick={onWatchlistClick}
-        onExportClick={handleExport} />
+        onExportClick={handleExport}
+      />
 
       {loading ? (
         <CircularProgress />
@@ -750,91 +780,144 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
                   boxShadow: 6,
                   borderRadius: 3,
                   backgroundColor: "#f5f5f5",
+                  padding: 3,
                 }}
               >
-                <CardContent>
+                {/* Header with Title and Filter */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 3,
+                    padding: "12px 24px",
+                    background: "linear-gradient(45deg, #1e88e5, #42a5f5)",
+                    borderRadius: 2,
+                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                  }}
+                >
+                  {/* Title */}
                   <Typography
                     variant="h6"
-                    gutterBottom
                     sx={{
                       fontWeight: "bold",
                       color: "#fff",
-                      background: "linear-gradient(45deg, #1e88e5, #42a5f5)",
-                      padding: "12px 24px",
-                      borderRadius: 2,
-                      textAlign: "center",
-                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-                      "&:hover": {
-                        background: "linear-gradient(45deg, #42a5f5, #1e88e5)",
-                        cursor: "pointer",
-                      },
                     }}
                   >
                     Portfolio Value Over Time
                   </Typography>
 
-                  <Card
+                  {/* Filter */}
+                  <FormControl
                     sx={{
-                      boxShadow: 6,
+                      minWidth: 200,
                       backgroundColor: "#fff",
-                      padding: 3,
                       borderRadius: 2,
-                      mt: 2,
-                      "&:hover": {
-                        boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
+                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "transparent",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#1e88e5",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#1e88e5",
+                        },
                       },
                     }}
                   >
-                    <Line
-                      data={chartData}
-                      options={{
-                        responsive: true,
-                        plugins: {
-                          legend: {
-                            position: "top",
-                            labels: {
-                              font: {
-                                size: 14,
-                                weight: "bold",
-                              },
-                              color: "#333",
-                            },
-                          },
-                          tooltip: {
-                            callbacks: {
-                              label: (tooltipItem) => {
-                                return `Value: $${tooltipItem.raw.toFixed(2)}`;
-                              },
-                            },
-                          },
-                        },
-                        scales: {
-                          x: {
-                            grid: {
-                              display: false,
-                            },
-                            title: {
-                              display: true,
-                              text: "Date",
-                            },
-                          },
-                          y: {
-                            ticks: {
-                              beginAtZero: true,
-                            },
-                            grid: {
-                              borderColor: "#ddd",
-                            },
-                            title: {
-                              display: true,
-                              text: "Portfolio Value",
-                            },
-                          },
+                    <InputLabel
+                      id="stock-select-label"
+                      sx={{ color: "#000" }}
+                    >
+                      Select Stock
+                    </InputLabel>
+                    <Select
+                      labelId="stock-select-label"
+                      id="stock-select"
+                      value={selectedStock}
+                      onChange={handleStockSelection}
+                      label="Select Stock"
+                      sx={{
+                        color: "#1e88e5",
+                        fontWeight: "bold",
+                        "& .MuiSelect-icon": {
+                          color: "#1e88e5",
                         },
                       }}
-                    />
-                  </Card>
-                </CardContent>
+                    >
+                      <MenuItem value="" sx={{color: "#1e88e5"}}>All Stocks</MenuItem>
+                      {portfolio.map((stock) => (
+                        <MenuItem key={stock.ticker} value={stock.ticker}>
+                          {stock.ticker}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Box>
+
+                {/* Chart */}
+                <Card
+                  sx={{
+                    boxShadow: 6,
+                    backgroundColor: "#fff",
+                    padding: 3,
+                    borderRadius: 2,
+                    "&:hover": {
+                      boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
+                    },
+                  }}
+                >
+                  <Line
+                    data={chartData}
+                    options={{
+                      responsive: true,
+                      plugins: {
+                        legend: {
+                          position: "top",
+                          labels: {
+                            font: {
+                              size: 14,
+                              weight: "bold",
+                            },
+                            color: "#333",
+                          },
+                        },
+                        tooltip: {
+                          callbacks: {
+                            label: (tooltipItem) => {
+                              return `Value: $${tooltipItem.raw.toFixed(2)}`;
+                            },
+                          },
+                        },
+                      },
+                      scales: {
+                        x: {
+                          grid: {
+                            display: false,
+                          },
+                          title: {
+                            display: true,
+                            text: "Date",
+                          },
+                        },
+                        y: {
+                          ticks: {
+                            beginAtZero: true,
+                          },
+                          grid: {
+                            borderColor: "#ddd",
+                          },
+                          title: {
+                            display: true,
+                            text: "Portfolio Value",
+                          },
+                        },
+                      },
+                    }}
+                  />
+                </Card>
               </Card>
             </Grid2>
 
