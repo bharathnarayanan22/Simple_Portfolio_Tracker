@@ -25,7 +25,8 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import axios from "axios";
 import PropTypes from "prop-types";
-
+import buy from "../assets/buy.jpg";
+import sell from "../assets/sell.webp";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -266,7 +267,7 @@ const StocksManagementComponent = ({
               component="img"
               alt="Buy Stocks Image"
               height="200"
-              image="src/assets/buy.jpg"
+              image= {buy}
             />
             <CardContent>
               <Typography gutterBottom variant="h5" component="div">
@@ -303,7 +304,7 @@ const StocksManagementComponent = ({
               component="img"
               alt="Sell Stocks Image"
               height="200"
-              image="src/assets/sell.webp"
+              image={sell}
             />
             <CardContent>
               <Typography gutterBottom variant="h5" component="div">

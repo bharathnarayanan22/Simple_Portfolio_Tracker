@@ -17,11 +17,11 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import { AuthContext } from "../context/AuthContext.jsx";
+import logo from "../assets/logo.png";
 
 
 const Navbar = () => {
   const navigate = useNavigate();
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { isLoggedIn, logout } = useContext(AuthContext);
   const [anchorEl, setAnchorEl] = useState(null);
   const theme = useTheme();
@@ -31,18 +31,6 @@ const Navbar = () => {
     logout();
     navigate("/");
   };
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   setIsLoggedIn(!!token);
-  // }, []);
-
-  // const handleLogout = () => {
-  //   localStorage.removeItem("token");
-  //   localStorage.removeItem("userId");
-  //   localStorage.removeItem("name");
-  //   setIsLoggedIn(false);
-  //   navigate("/");
-  // };
 
   const handleMenuClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -73,7 +61,7 @@ const Navbar = () => {
     >
       <Toolbar>
         <img
-          src="/src/assets/logo.png"
+          src={logo}
           alt="Logo"
           style={{ width: "40px", height: "40px", marginRight: "10px" }} 
         />

@@ -13,7 +13,7 @@ public class StockPriceScheduler {
     @Autowired
     private StockPriceService stockPriceService;
 
-    @Scheduled(fixedRate = 600000) 
+    @Scheduled(fixedRate = 3600000) 
     public void updateStockPrices() {
         stockPriceService.generateStockPrices();
     }

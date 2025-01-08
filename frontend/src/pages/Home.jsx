@@ -15,6 +15,14 @@ import { keyframes } from "@emotion/react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { AuthContext } from "../context/AuthContext.jsx";
+import i1 from "../assets/i1.jpg";
+import i2 from "../assets/i2.jpg";
+import i3 from "../assets/i3.jpg";
+import i4 from "../assets/i4.jpg";
+import i5 from "../assets/i5.jpg";
+import i6 from "../assets/i6.jpg";
+
+
 
 const fadeIn = keyframes`
   from {
@@ -28,18 +36,12 @@ const fadeIn = keyframes`
 `;
 
 const Home = () => {
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { isLoggedIn } = useContext(AuthContext);
 
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-  // // Check for token in local storage
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   setIsLoggedIn(!!token); // Set to true if token exists, otherwise false
-  // }, []);
 
   return (
     <Box sx={{ overflowX: "hidden" }}>
@@ -126,7 +128,7 @@ const Home = () => {
             sx={{ display: "flex", justifyContent: "center" }}
           >
             <img
-              src="/src/assets/6.jpg" 
+              src={i6} 
               alt="Portfolio Tracker"
               style={{ maxWidth: "100%", height: "auto", borderRadius: "8px" }}
             />
@@ -139,7 +141,7 @@ const Home = () => {
         {[
           {
             direction: { xs: "column", md: "row" },
-            image: "/src/assets/2.jpg",
+            image: i2,
             alt: "Portfolio Dashboard",
             title: "Your Personalized Portfolio Dashboard",
             content: [
@@ -149,7 +151,7 @@ const Home = () => {
           },
           {
             direction: { xs: "column", md: "row-reverse" },
-            image: "/src/assets/3.jpg",
+            image: i3,
             alt: "Performance Trends",
             title: "Uncover Key Performance Trends",
             content: [
@@ -159,7 +161,7 @@ const Home = () => {
           },
           {
             direction: { xs: "column", md: "row" },
-            image: "/src/assets/1.jpg",
+            image: i1,
             alt: "Stock Management",
             title: "Effortless Stock Management",
             content: [
@@ -169,7 +171,7 @@ const Home = () => {
           },
           {
             direction: { xs: "column", md: "row-reverse" },
-            image: "/src/assets/4.jpg",
+            image: i4,
             alt: "Watchlist",
             title: "Curated Stock Watchlist",
             content: [
@@ -179,7 +181,7 @@ const Home = () => {
           },
           {
             direction: { xs: "column", md: "row" },
-            image: "/src/assets/5.jpg",
+            image: i5,
             alt: "Transaction History",
             title: "Comprehensive Transaction History",
             content: [
