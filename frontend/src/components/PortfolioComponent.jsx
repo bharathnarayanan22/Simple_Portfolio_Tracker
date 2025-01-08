@@ -87,19 +87,16 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
 
       const userId = localStorage.getItem("userId");
       try {
-        // Step 1: Fetch portfolio data
         const portfolioResponse = await axios.get(
-          `http://localhost:8080/api/users/${userId}/portfolio`
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/portfolio`
         );
         const portfolioData = portfolioResponse.data;
 
-        // Step 2: Fetch all stocks
         const allStocksResponse = await axios.get(
-          "http://localhost:8080/stocks"
+          "https://simple-portfolio-tracker-1-durb.onrender.com/stocks"
         );
         const allStocks = allStocksResponse.data;
 
-        // Step 3: Match portfolio stocks with all stocks
         const matchedPortfolio = portfolioData.map((portfolioStock) => {
           const stockDetails = allStocks.find(
             (stock) => stock.ticker === portfolioStock.ticker
@@ -108,15 +105,15 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
           if (stockDetails) {
             return {
               ...portfolioStock,
-              stockId: stockDetails.id, // Use stock's id for fetching history
+              stockId: stockDetails.id, 
               currentPrice: stockDetails.price,
               sector: stockDetails.sector || "Unknown",
-              dividendYield: Math.random() * 0.05, // Example data
+              dividendYield: Math.random() * 0.05, 
             };
           } else {
             return {
               ...portfolioStock,
-              currentPrice: portfolioStock.purchasePrice, // Fallback if no match
+              currentPrice: portfolioStock.purchasePrice, 
             };
           }
         });
@@ -124,10 +121,8 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
         const newSectorData = calculateSectorData(matchedPortfolio);
         setSectorData(newSectorData);
 
-        // Step 4: Fetch price history for matched stocks
         const portfolioTimeline = await fetchTimelineData(matchedPortfolio);
 
-        // Update state with processed data
         setPortfolio(matchedPortfolio);
         setTimelineData(portfolioTimeline);
         calculateSummary(matchedPortfolio);
@@ -152,8 +147,7 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
       const sectorData = {};
 
       portfolio.forEach((stock) => {
-        // Find the sector based on the sectorMap
-        let sector = "Other"; // Default sector if no match
+        let sector = "Other"; 
         for (const [key, tickers] of Object.entries(sectorMap)) {
           if (tickers.includes(stock.ticker)) {
             sector = key;
@@ -161,10 +155,8 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
           }
         }
 
-        // Calculate the value for the stock in the corresponding sector
         const value = stock.currentPrice * stock.quantity;
 
-        // Add the value to the sector's total
         if (sectorData[sector]) {
           sectorData[sector] += value;
         } else {
@@ -180,14 +172,13 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
 
       for (const stock of portfolio) {
         try {
-          // Fetch price history using stockId
           const response = await axios.get(
-            `http://localhost:8080/api/stockPrices/history/${stock.stockId}`
+            `https://simple-portfolio-tracker-1-durb.onrender.com/api/stockPrices/history/${stock.stockId}`
           );
           const stockPriceHistory = response.data;
 
           stockPriceHistory.forEach((priceData) => {
-            const date = priceData.timestamp; // Use timestamp as date
+            const date = priceData.timestamp; 
             const valueAtDate = stock.quantity * priceData.price;
 
             const existingEntry = timelineData.find(
@@ -208,7 +199,6 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
         }
       }
 
-      // Sort timeline data by date
       timelineData.sort((a, b) => new Date(a.date) - new Date(b.date));
       return timelineData;
     };
@@ -286,25 +276,21 @@ const PortfolioComponent = ({ onBuyClick, onSellClick, onWatchlistClick, onExpor
       return;
     }
   
-    // Convert portfolio data to CSV format
     const csvHeaders = "Ticker,Stock Name,Quantity,Purchase Price,Current Price,Total Value\n";
     const csvRows = portfolio.map((stock) => 
       `${stock.ticker},${stock.stockName},${stock.quantity},${stock.purchasePrice},${stock.currentPrice},${(stock.quantity * stock.currentPrice).toFixed(2)}`
     );
     const csvContent = [csvHeaders, ...csvRows].join("\n");
   
-    // Create a Blob and trigger download
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
   
-    // Create a temporary anchor element to trigger the download
     const a = document.createElement("a");
     a.href = url;
     a.download = `portfolio_${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(a);
     a.click();
   
-    // Clean up
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };

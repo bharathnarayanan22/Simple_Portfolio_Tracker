@@ -16,7 +16,7 @@ public class Watchlist {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;  // Assuming you have a User entity
+    private User user;  
 
     @ManyToOne
     @JoinColumn(name = "stock_id", referencedColumnName = "id")

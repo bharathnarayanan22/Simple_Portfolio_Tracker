@@ -21,12 +21,12 @@ public class Transaction {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    private String action; // "BUY" or "SELL"
+    private String action; 
     private String stockName;
     private String ticker;
     private Integer quantity;
     private Double price;
-    private Double amount; // Total transaction amount
+    private Double amount; 
     private LocalDateTime date;
     
     //Getters and Setters

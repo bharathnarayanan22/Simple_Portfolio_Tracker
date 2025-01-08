@@ -63,7 +63,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
     const fetchData = async () => {
       try {
         const allStocksResponse = await axios.get(
-          "http://localhost:8080/stocks"
+          "https://simple-portfolio-tracker-1-durb.onrender.com/stocks"
         );
         const allStocks = allStocksResponse.data;
         const sortedOverallStocks = [...allStocks].sort(
@@ -72,7 +72,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
         setOverallTopStocks(sortedOverallStocks.slice(0, 3));
 
         const portfolioResponse = await axios.get(
-          `http://localhost:8080/api/users/${userId}/portfolio`
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/portfolio`
         );
         const portfolioData = portfolioResponse.data;
 
@@ -98,7 +98,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
         setMyTopStocks(sortedMyStocks.slice(0, 3));
 
         const transactionsResponse = await axios.get(
-          `http://localhost:8080/api/users/${userId}/transactions`
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/transactions`
         );
         const transactions = transactionsResponse.data;
 
@@ -118,13 +118,13 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
     const fetchWatchlistUpdates = async () => {
       try {
         const watchlistResponse = await axios.get(
-          `http://localhost:8080/api/users/${userId}/watchlist`
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/watchlist`
         );
         const watchlistStocks = watchlistResponse.data;
 
         const stockDetails = await Promise.all(
           watchlistStocks.map((stock) =>
-            axios.get(`http://localhost:8080/stocks/${stock}`)
+            axios.get(`https://simple-portfolio-tracker-1-durb.onrender.com/stocks/${stock}`)
           )
         );
 
@@ -212,26 +212,26 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
           <Grid item xs={12} sm={6}>
             <Card
               sx={{
-                bgcolor: "#FFFFFF", // White background for the card
-                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
+                bgcolor: "#FFFFFF", 
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", 
                 borderRadius: 3,
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   transform: "scale(1.05)",
-                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", 
                 },
               }}
             >
               {/* Upper Section */}
               <Box
                 sx={{
-                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
-                  color: "#FFFFFF", // White text color
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", 
+                  color: "#FFFFFF",
                   padding: 3,
-                  borderRadius: "12px 12px 0 0", // Rounded top corners
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)", // Subtle shadow for depth
-                  position: "relative", // For positioning the button
-                  overflow: "hidden", // Ensures no overflow from child elements
+                  borderRadius: "12px 12px 0 0", 
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)", 
+                  position: "relative", 
+                  overflow: "hidden",
                 }}
               >
                 <Typography
@@ -241,8 +241,8 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                     fontWeight: "bold",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-between", // Ensures the button stays on the same line as the title
-                    marginBottom: 0, // Remove extra space below title
+                    justifyContent: "space-between", 
+                    marginBottom: 0, 
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -357,21 +357,21 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
           <Grid item xs={12} sm={6}>
             <Card
               sx={{
-                bgcolor: "#FFFFFF", // White background for the card
-                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
+                bgcolor: "#FFFFFF", 
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", 
                 borderRadius: 3,
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   transform: "scale(1.05)",
-                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", 
                 },
               }}
             >
               {/* Upper Section */}
               <Box
                 sx={{
-                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
-                  color: "#FFFFFF", // White text color
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", 
+                  color: "#FFFFFF", 
                   padding: 3,
                   borderTopLeftRadius: 3,
                   borderTopRightRadius: 3,
@@ -449,10 +449,10 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                           fontSize: "3rem",
                           color:
                             index === 0
-                              ? "#FFD700" // Gold for 1st place
+                              ? "#FFD700" 
                               : index === 1
-                              ? "#C0C0C0" // Silver for 2nd place
-                              : "#CD7F32", // Bronze for 3rd place
+                              ? "#C0C0C0" 
+                              : "#CD7F32",
                           animation: "pulse 1.5s infinite",
                           "@keyframes pulse": {
                             "0%, 100%": {
@@ -471,7 +471,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                       <Typography
                         variant="body1"
                         sx={{
-                          color: "#2C3E50", // Dark blue text color
+                          color: "#2C3E50", 
                           fontWeight: "bold",
                           mt: 1,
                         }}
@@ -481,7 +481,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                       <Typography
                         variant="body2"
                         sx={{
-                          color: stock.profitLoss >= 0 ? "#27AE60" : "#E74C3C", // Green for profit, red for loss
+                          color: stock.profitLoss >= 0 ? "#27AE60" : "#E74C3C", 
                           fontWeight: "bold",
                         }}
                       >
@@ -500,21 +500,21 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
           <Grid item xs={12} sm={6}>
             <Card
               sx={{
-                bgcolor: "#FFFFFF", // White background for the card
-                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
+                bgcolor: "#FFFFFF",
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
                 borderRadius: 3,
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   transform: "scale(1.02)",
-                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", 
                 },
               }}
             >
               {/* Upper Section */}
               <Box
                 sx={{
-                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
-                  color: "#FFFFFF", // White text color
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", 
+                  color: "#FFFFFF", 
                   padding: 3,
                   borderTopLeftRadius: 3,
                   borderTopRightRadius: 3,
@@ -577,11 +577,11 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                         mb: 2,
                         padding: 2,
                         borderRadius: 2,
-                        backgroundColor: "#F5F5F5", // Light gray background for each transaction
+                        backgroundColor: "#F5F5F5", 
                         transition: "transform 0.3s ease, box-shadow 0.3s ease",
                         "&:hover": {
-                          transform: "translateX(10px)", // Slide effect on hover
-                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // Shadow on hover
+                          transform: "translateX(10px)", 
+                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", 
                         },
                       }}
                     >
@@ -591,7 +591,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                           bgcolor:
                             transaction.action === "Buy"
                               ? "#27AE60"
-                              : "#E74C3C", // Green for Buy, Red for Sell
+                              : "#E74C3C", 
                           color: "#FFFFFF",
                           borderRadius: "50%",
                           width: 40,
@@ -616,7 +616,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                             variant="body1"
                             sx={{
                               fontWeight: "bold",
-                              color: "#2C3E50", // Dark blue text color
+                              color: "#2C3E50",
                             }}
                           >
                             {transaction.action} {transaction.quantity} shares
@@ -627,7 +627,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                           <Typography
                             variant="body2"
                             sx={{
-                              color: "#7F8C8D", // Gray text color for secondary info
+                              color: "#7F8C8D", 
                             }}
                           >
                             Date:{" "}
@@ -646,21 +646,21 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
           <Grid item xs={12} sm={6}>
             <Card
               sx={{
-                bgcolor: "#FFFFFF", // White background for the card
-                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
+                bgcolor: "#FFFFFF", 
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", 
                 borderRadius: 3,
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   transform: "scale(1.02)",
-                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", 
                 },
               }}
             >
               {/* Upper Section */}
               <Box
                 sx={{
-                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
-                  color: "#FFFFFF", // White text color
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", 
+                  color: "#FFFFFF",
                   padding: 3,
                   borderTopLeftRadius: 3,
                   borderTopRightRadius: 3,
@@ -693,18 +693,18 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                         mb: 2,
                         padding: 2,
                         borderRadius: 2,
-                        backgroundColor: "#F5F5F5", // Light gray background for each notification
+                        backgroundColor: "#F5F5F5", 
                         transition: "transform 0.3s ease, box-shadow 0.3s ease",
                         "&:hover": {
-                          transform: "translateX(10px)", // Slide effect on hover
-                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // Shadow on hover
+                          transform: "translateX(10px)", 
+                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", 
                         },
                       }}
                     >
                       {/* Notification Icon */}
                       <Box
                         sx={{
-                          bgcolor: "#FFC107", // Orange background for notifications
+                          bgcolor: "#FFC107", 
                           color: "#FFFFFF",
                           borderRadius: "50%",
                           width: 40,
@@ -726,7 +726,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                             variant="body1"
                             sx={{
                               fontWeight: "bold",
-                              color: "#2C3E50", // Dark blue text color
+                              color: "#2C3E50", 
                             }}
                           >
                             {notification}
@@ -747,21 +747,21 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
           <Grid item xs={12}>
             <Card
               sx={{
-                bgcolor: "#FFFFFF", // White background for the card
-                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
+                bgcolor: "#FFFFFF", 
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", 
                 borderRadius: 3,
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   transform: "scale(1.02)",
-                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", 
                 },
               }}
             >
               {/* Upper Section */}
               <Box
                 sx={{
-                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
-                  color: "#FFFFFF", // White text color
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", 
+                  color: "#FFFFFF", 
                   padding: 3,
                   borderTopLeftRadius: 3,
                   borderTopRightRadius: 3,
@@ -794,18 +794,18 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                         mb: 2,
                         padding: 2,
                         borderRadius: 2,
-                        backgroundColor: "#F5F5F5", // Light gray background for each news item
+                        backgroundColor: "#F5F5F5", 
                         transition: "transform 0.3s ease, box-shadow 0.3s ease",
                         "&:hover": {
-                          transform: "translateX(10px)", // Slide effect on hover
-                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // Shadow on hover
+                          transform: "translateX(10px)",
+                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", 
                         },
                       }}
                     >
                       {/* News Icon */}
                       <Box
                         sx={{
-                          bgcolor: "#2196F3", // Blue background for news
+                          bgcolor: "#2196F3", 
                           color: "#FFFFFF",
                           borderRadius: "50%",
                           width: 40,
@@ -816,7 +816,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                           mr: 2,
                         }}
                       >
-                        <NewspaperIcon fontSize="small" /> {/* Icon for news */}
+                        <NewspaperIcon fontSize="small" /> 
                       </Box>
 
                       {/* News Details */}
@@ -826,7 +826,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                             variant="body1"
                             sx={{
                               fontWeight: "bold",
-                              color: "#2C3E50", // Dark blue text color
+                              color: "#2C3E50", 
                             }}
                           >
                             {newsItem}
@@ -844,21 +844,21 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
           <Grid item xs={12}>
             <Card
               sx={{
-                bgcolor: "#FFFFFF", // White background for the card
-                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", // Soft shadow for neumorphic effect
+                bgcolor: "#FFFFFF", 
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", 
                 borderRadius: 3,
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   transform: "scale(1.02)",
-                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", // Increased shadow on hover
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", 
                 },
               }}
             >
               {/* Upper Section */}
               <Box
                 sx={{
-                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", // Gradient background
-                  color: "#FFFFFF", // White text color
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", 
+                  color: "#FFFFFF", 
                   padding: 3,
                   borderTopLeftRadius: 3,
                   borderTopRightRadius: 3,
@@ -922,19 +922,19 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                           mb: 2,
                           padding: 2,
                           borderRadius: 2,
-                          backgroundColor: "#F5F5F5", // Light gray background for each stock
+                          backgroundColor: "#F5F5F5", 
                           transition:
                             "transform 0.3s ease, box-shadow 0.3s ease",
                           "&:hover": {
-                            transform: "translateX(10px)", // Slide effect on hover
-                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", // Shadow on hover
+                            transform: "translateX(10px)", 
+                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", 
                           },
                         }}
                       >
                         {/* Stock Icon */}
                         <Box
                           sx={{
-                            bgcolor: "#E74C3C", // Red background for price decrease
+                            bgcolor: "#E74C3C", 
                             color: "#FFFFFF",
                             borderRadius: "50%",
                             width: 40,
@@ -956,7 +956,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                               variant="body1"
                               sx={{
                                 fontWeight: "bold",
-                                color: "#2C3E50", // Dark blue text color
+                                color: "#2C3E50", 
                               }}
                             >
                               {stock.stock_name} ({stock.ticker})
@@ -966,7 +966,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                             <Typography
                               variant="body2"
                               sx={{
-                                color: "#7F8C8D", // Gray text color for secondary info
+                                color: "#7F8C8D", 
                               }}
                             >
                               Price Decrease: {Math.abs(stock.percentageChange)}
@@ -981,7 +981,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                   <Typography
                     variant="body1"
                     sx={{
-                      color: "#7F8C8D", // Gray text color
+                      color: "#7F8C8D", 
                       textAlign: "center",
                       mt: 2,
                     }}

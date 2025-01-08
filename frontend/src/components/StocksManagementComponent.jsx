@@ -65,32 +65,28 @@ const StocksManagementComponent = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch funds
         const fundsResponse = await axios.get(
-          `http://localhost:8080/api/users/${userId}/funds`
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/funds`
         );
         setFunds(fundsResponse.data);
 
-        // Fetch stocks from the database
-        const stocksResponse = await axios.get("http://localhost:8080/stocks");
+        const stocksResponse = await axios.get("https://simple-portfolio-tracker-1-durb.onrender.com/stocks");
         const initialStocks = stocksResponse.data.map((stock) => ({
           ...stock,
           price: generateRandomPrice(stock.price || 100), // Add initial price if not present
         }));
         setStocks(initialStocks);
 
-        // Fetch user-owned stocks
         const ownedStocksResponse = await axios.get(
-          `http://localhost:8080/api/users/${userId}/stocks`
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/stocks`
         );
         setOwnedStocks(ownedStocksResponse.data);
 
         const response = await axios.get(
-          `http://localhost:8080/api/users/${userId}/portfolio`
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/portfolio`
         );
         const portfolioData = response.data;
 
-        // Mock current prices for selling
         const updatedData = portfolioData.map((stock) => ({
           ...stock,
           currentPrice: stock.purchasePrice * (1 + Math.random() * 0.2 - 0.1),
@@ -99,7 +95,7 @@ const StocksManagementComponent = ({
         setPortfolio(updatedData);
 
         const watchlistResponse = await axios.get(
-          `http://localhost:8080/api/users/${userId}/watchlist`
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/watchlist`
         );
         setWatchlist(watchlistResponse.data);
       } catch (error) {
@@ -111,12 +107,11 @@ const StocksManagementComponent = ({
   }, [funds, userId]);
 
   useEffect(() => {
-    // Update stock prices every 5 seconds
     const interval = setInterval(() => {
       setStocks((prevStocks) =>
         prevStocks.map((stock) => ({
           ...stock,
-          price: generateRandomPrice(stock.price), // Simulate dynamic price changes
+          price: generateRandomPrice(stock.price), 
         }))
       );
     }, 5000);
@@ -131,7 +126,7 @@ const StocksManagementComponent = ({
     if (funds >= totalCost) {
       setLoading(true);
       try {
-        await axios.post(`http://localhost:8080/api/users/${userId}/buyStock`, {
+        await axios.post(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/buyStock`, {
           stockName: stock.stock_name,
           ticker: stock.ticker,
           price: stock.price,
@@ -154,7 +149,7 @@ const StocksManagementComponent = ({
 
   const handleAddToWatchlist = async (stock) => {
     try {
-      await axios.post(`http://localhost:8080/api/users/${userId}/watchlist`, {
+      await axios.post(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/watchlist`, {
         stockId: stock.id,
       });
       setWatchlist((prev) => [...prev, stock.id]);
@@ -168,7 +163,7 @@ const StocksManagementComponent = ({
   const handleRemoveFromWatchlist = async (stockId) => {
     try {
       await axios.delete(
-        `http://localhost:8080/api/users/${userId}/watchlist`,
+        `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/watchlist`,
         {
           data: { stockId },
         }
@@ -183,22 +178,20 @@ const StocksManagementComponent = ({
 
   const handleSellClick = (stock) => {
     setSelectedStock(stock);
-    setOpenModal(true); // Open modal for quantity input
+    setOpenModal(true); 
   };
 
   const handleSell = async () => {
     const ownedQuantity =
       ownedStocks.find((s) => s.id === selectedStock.id)?.quantity || 0;
 
-    // Validate the quantity input
     if (quantityToSell > 0 && quantityToSell <= ownedQuantity) {
       const totalValue = selectedStock.purchasePrice * quantityToSell;
 
       setLoading(true);
       try {
-        // Post sell request to backend
         await axios.post(
-          `http://localhost:8080/api/users/${userId}/sellStock`,
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/sellStock`,
           {
             stockId: selectedStock.id,
             quantity: quantityToSell,
@@ -227,8 +220,8 @@ const StocksManagementComponent = ({
         toast.error("Failed to sell stock.");
       } finally {
         setLoading(false);
-        setOpenModal(false); // Close modal after sell
-        setQuantityToSell(0); // Reset the quantity input
+        setOpenModal(false); 
+        setQuantityToSell(0); 
       }
     } else {
       alert("Invalid quantity for selling. Please enter a valid amount.");
@@ -252,8 +245,8 @@ const StocksManagementComponent = ({
             stock.price <= priceRange[1]
         )
       : portfolio.map((ownedStock) => ({
-          ...ownedStock, // Keep all properties from ownedStock
-          price: generateRandomPrice(ownedStock.purchase_price), // Simulate price fluctuation
+          ...ownedStock, 
+          price: generateRandomPrice(ownedStock.purchase_price), 
         }));
 
   return (
@@ -310,7 +303,7 @@ const StocksManagementComponent = ({
               component="img"
               alt="Sell Stocks Image"
               height="200"
-              image="src/assets/sell.jpg"
+              image="src/assets/sell3.webp"
             />
             <CardContent>
               <Typography gutterBottom variant="h5" component="div">
@@ -343,7 +336,7 @@ const StocksManagementComponent = ({
               variant="h4"
               sx={{
                 fontWeight: "bold",
-                color: "primary.main", // Matches your theme's primary color
+                color: "primary.main", 
                 mb: 2,
               }}
             >

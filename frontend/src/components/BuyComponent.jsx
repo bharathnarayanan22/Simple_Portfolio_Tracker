@@ -7,18 +7,15 @@ const BuyComponent = () => {
   const [stocks, setStocks] = useState([]);
 
   useEffect(() => {
-    // Fetch stocks from an API or a mock function
     setStocks([
       { id: 1, name: "Stock 1", ticker: "STK1", price: 100 },
       { id: 2, name: "Stock 2", ticker: "STK2", price: 200 },
       { id: 3, name: "Stock 3", ticker: "STK3", price: 150 },
-      // Add more stocks here
     ]);
   }, []);
 
   const handleBuyStock = (stock) => {
     setLoading(true);
-    // API call to buy the stock, then update DB and state
     setTimeout(() => {
       setLoading(false);
       alert(`You bought ${stock.name} for $${stock.price}`);
@@ -40,7 +37,7 @@ const BuyComponent = () => {
                 component="img"
                 alt={stock.name}
                 height="200"
-                image={`https://via.placeholder.com/150`} // Replace with actual image URL if needed
+                image={`https://via.placeholder.com/150`} 
               />
               <CardContent>
                 <Typography gutterBottom variant="h6" component="div">

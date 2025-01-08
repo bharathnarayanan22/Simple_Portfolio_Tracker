@@ -22,6 +22,8 @@ import {
 import axios from "axios";
 import ReceiptIcon from "@mui/icons-material/Receipt"; 
 import DownloadIcon from "@mui/icons-material/Download";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 const TransactionsComponent = () => {
@@ -39,8 +41,8 @@ const TransactionsComponent = () => {
     const fetchData = async () => {
       try {
         const [fundsResponse, transactionsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/api/users/${userId}/funds`),
-          axios.get(`http://localhost:8080/api/users/${userId}/transactions`),
+          axios.get(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/funds`),
+          axios.get(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/transactions`),
         ]);
 
         setFunds(fundsResponse.data);
@@ -67,15 +69,15 @@ const TransactionsComponent = () => {
     if (increaseAmount > 0) {
       try {
         await axios.post(
-          `http://localhost:8080/api/users/${userId}/addFunds?amount=${increaseAmount}`
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/addFunds?amount=${increaseAmount}`
         );
         setFunds(funds + increaseAmount);
-        alert(`Funds increased by $${increaseAmount.toFixed(2)}`);
+        toast.success(`Funds increased by $${increaseAmount.toFixed(2)}`);
         setIncreaseFundsModalOpen(false);
         setIncreaseAmount(0);
       } catch (error) {
         console.error("Error increasing funds:", error);
-        alert("Failed to increase funds.");
+        toast.error("Failed to increase funds.");
       }
     } else {
       alert("Enter a valid amount.");
@@ -113,13 +115,11 @@ const TransactionsComponent = () => {
     setPage(newPage);
   };
 
-  // Handle rows per page change
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // Reset to first page when rows per page change
+    setPage(0); 
   };
 
-  // Calculate the data for the current page
   const paginatedTransactions = transactions.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
@@ -213,14 +213,12 @@ const TransactionsComponent = () => {
               transition: "0.3s",
               "&:hover": {
                 boxShadow: 6,
-                backgroundColor: "primary.main", // Change card background to primary
+                backgroundColor: "primary.main", 
                 "& .MuiButton-root": {
-                  // Button hover effect inside the card
                   backgroundColor: "white",
                   color: "primary.main",
                 },
                 "& .MuiTypography-root": {
-                  // Change typography color on hover
                   color: "white",
                 },
               },
@@ -385,6 +383,7 @@ const TransactionsComponent = () => {
           </Button>
         </Box>
       </Modal>
+      <ToastContainer />
     </Container>
   );
 };

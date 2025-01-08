@@ -72,7 +72,6 @@ const Navbar = () => {
       }}
     >
       <Toolbar>
-        {/* Add your logo here */}
         <img
           src="/src/assets/logo.png"
           alt="Logo"

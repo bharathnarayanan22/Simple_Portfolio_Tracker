@@ -15,7 +15,7 @@ public class Stock {
     private Long id;
 
     @Column(nullable = false)
-    private String stock_name; // Changed here
+    private String stock_name; 
 
     @Column(nullable = false, unique = true)
     private String ticker;
@@ -35,11 +35,11 @@ public class Stock {
         this.id = id;
     }
 
-    public String getStock_name() { // Updated getter
+    public String getStock_name() { 
         return stock_name;
     }
 
-    public void setStock_name(String stock_name) { // Updated setter
+    public void setStock_name(String stock_name) { 
         this.stock_name = stock_name;
     }
 

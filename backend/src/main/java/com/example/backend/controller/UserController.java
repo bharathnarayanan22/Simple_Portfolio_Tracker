@@ -12,8 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.backend.model.Watchlist;
-import com.example.backend.model.Stock;
+
 import com.example.backend.model.Transaction;
 import com.example.backend.model.UserStock;
 import com.example.backend.repository.TransactionRepository;
@@ -45,7 +44,7 @@ public class UserController {
     @PostMapping("/{userId}/sellStock")
     public ResponseEntity<String> sellStock(
             @PathVariable Long userId,
-            @RequestBody SellStockRequest sellStockRequest // Accept the sell stock request body
+            @RequestBody SellStockRequest sellStockRequest 
     ) {
         userService.sellStock(userId, sellStockRequest);
         return ResponseEntity.ok("Stock sold successfully!");

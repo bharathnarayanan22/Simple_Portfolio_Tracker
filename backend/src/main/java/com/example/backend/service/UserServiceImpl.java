@@ -64,7 +64,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void buyStock(Long userId, BuyStockRequest buyStockRequest) {
-        // Fetch user
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found!"));
 
@@ -75,7 +74,6 @@ public class UserServiceImpl implements UserService {
 
         Double totalCost = price * quantity;
 
-        // Check if the user has enough funds
         if (user.getFunds() < totalCost) {
             throw new RuntimeException("Insufficient funds!");
         }
@@ -83,31 +81,25 @@ public class UserServiceImpl implements UserService {
         Stock stock = stockRepository.findByTicker(ticker)
                 .orElseThrow(() -> new RuntimeException("Stock not found!"));
 
-        // Check if there is enough volume available
         if (stock.getVolume() < quantity) {
             throw new RuntimeException("Not enough stock volume available!");
         }
 
-        // Deduct the purchased volume from the stock
         stock.setVolume(stock.getVolume() - quantity);
         stockRepository.save(stock);
 
-        // Deduct funds from user account
         user.setFunds(user.getFunds() - totalCost);
-        userRepository.save(user); // Save user with updated funds
+        userRepository.save(user); 
 
-        // Check if the user already owns this stock
         Optional<UserStock> existingUserStock = userStockRepository.findByUserIdAndTicker(userId, ticker);
 
         if (existingUserStock.isPresent()) {
-            // Stock already exists, update the quantity and purchase price
             UserStock userStock = existingUserStock.get();
             userStock.setQuantity(userStock.getQuantity() + quantity);
             userStock.setPurchasePrice(price);
             userStockRepository.save(userStock);
             System.out.println("Updated " + quantity + " shares of " + stockName + " at $" + price + " each.");
         } else {
-            // Stock doesn't exist for this user, create new UserStock
             UserStock userStock = new UserStock();
             userStock.setUser(user);
             userStock.setStockName(stockName);
@@ -119,7 +111,6 @@ public class UserServiceImpl implements UserService {
             System.out.println("Bought " + quantity + " shares of " + stockName + " at $" + price + " each.");
         }
 
-        // Record the transaction
         Transaction transaction = new Transaction();
         transaction.setUser(user);
         transaction.setAction("BUY");
@@ -201,23 +192,19 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Fetch the stock by its ID
         Stock stock = stockRepository.findById(stockId)
                 .orElseThrow(() -> new RuntimeException("Stock not found"));
 
-        // Check if the stock is already in the user's watchlist
         Optional<Watchlist> existingWatchlistEntry = watchlistRepository.findByUserIdAndStockId(userId, stockId);
 
         if (existingWatchlistEntry.isPresent()) {
             throw new RuntimeException("Stock is already in the watchlist");
         }
 
-        // Create a new Watchlist entry
         Watchlist watchlist = new Watchlist();
         watchlist.setStock(stock);
         watchlist.setUser(user);
 
-        // Save the new entry
         watchlistRepository.save(watchlist);
     }
 

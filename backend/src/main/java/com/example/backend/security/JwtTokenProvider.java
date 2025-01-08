@@ -15,7 +15,6 @@ public class JwtTokenProvider {
 
     private final long EXPIRATION_TIME = 86400000; // 1 day
 
-    // Generate a secure key of at least 256 bits for HS512
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
     public String generateToken(String email) {

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend.model.User;
 import com.example.backend.repository.UserRepository;
-import com.example.backend.response.LoginResponse; // Import the LoginResponse class
+import com.example.backend.response.LoginResponse; 
 import com.example.backend.security.JwtTokenProvider;
 
 @RestController
@@ -41,10 +41,9 @@ public class AuthController {
         if (passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
             String token = jwtTokenProvider.generateToken(existingUser.getEmail());
 
-            // Create LoginResponse object with id, name, and token
             LoginResponse loginResponse = new LoginResponse(existingUser.getId(), existingUser.getName(), token);
 
-            return ResponseEntity.ok(loginResponse);  // Return the response with id, name, and token
+            return ResponseEntity.ok(loginResponse);  
         } else {
             return ResponseEntity.status(401).body("Invalid credentials");
         }

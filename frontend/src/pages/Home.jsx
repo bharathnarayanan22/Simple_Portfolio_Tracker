@@ -16,7 +16,6 @@ import { LazyLoadImage } from "react-lazy-load-image-component";
 import "react-lazy-load-image-component/src/effects/blur.css";
 import { AuthContext } from "../context/AuthContext.jsx";
 
-// Fade-in animation
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -45,11 +44,9 @@ const Home = () => {
   return (
     <Box sx={{ overflowX: "hidden" }}>
       <Navbar />
-      {/* Hero Section */}
-
       <Box
         sx={{
-          textAlign: "left", // Align text to the left
+          textAlign: "left", 
           mt: 4,
           mb: 4,
           px: 2,
@@ -62,7 +59,6 @@ const Home = () => {
         }}
       >
         <Grid container spacing={4} alignItems="center">
-          {/* Left Side: Content */}
           <Grid item xs={12} md={6}>
             <Typography
               variant="h3"
@@ -123,7 +119,6 @@ const Home = () => {
             </Box>
           </Grid>
 
-          {/* Right Side: Image */}
           <Grid
             item
             xs={12}
@@ -131,7 +126,7 @@ const Home = () => {
             sx={{ display: "flex", justifyContent: "center" }}
           >
             <img
-              src="/src/assets/6.jpg" // Replace with your image path
+              src="/src/assets/6.jpg" 
               alt="Portfolio Tracker"
               style={{ maxWidth: "100%", height: "auto", borderRadius: "8px" }}
             />

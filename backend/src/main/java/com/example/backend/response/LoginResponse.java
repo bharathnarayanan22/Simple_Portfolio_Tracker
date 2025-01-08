@@ -6,7 +6,6 @@ public class LoginResponse {
     private String name;
     private String token;
 
-    // Constructor
     public LoginResponse(Long id, String name, String token) {
         this.id = id;
         this.name = name;

@@ -17,7 +17,9 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { Undo, ShoppingCart } from "@mui/icons-material";
-import StarIcon from "@mui/icons-material/Star";
+import StarIcon from "@mui/icons-material/Star"
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const WatchlistComponent = () => {
   const [stockIds, setStockIds] = useState([]);
@@ -33,7 +35,7 @@ const WatchlistComponent = () => {
     const fetchWatchlist = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/users/${userId}/watchlist`
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/watchlist`
         );
         setStockIds(response.data);
       } catch (err) {
@@ -48,12 +50,12 @@ const WatchlistComponent = () => {
     const fetchStocks = async () => {
       try {
         const stockDetails = await Promise.all(
-          stockIds.map((id) => axios.get(`http://localhost:8080/stocks/${id}`))
+          stockIds.map((id) => axios.get(`https://simple-portfolio-tracker-1-durb.onrender.com/stocks/${id}`))
         );
         const enrichedStocks = stockDetails.map((response) => {
           const stock = response.data;
           const currentPrice = stock.price
-            ? stock.price * (1 + (Math.random() * 0.2 - 0.1)) // Simulate price change
+            ? stock.price * (1 + (Math.random() * 0.2 - 0.1)) 
             : null;
           return {
             ...stock,
@@ -88,17 +90,13 @@ const WatchlistComponent = () => {
 
     try {
       setLoading(true);
-      await axios.post(`http://localhost:8080/api/users/${userId}/buyStock`, {
+      await axios.post(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/buyStock`, {
         stockName: selectedStock.stock_name,
         ticker: selectedStock.ticker,
         price: selectedStock.price,
         quantity,
       });
-      alert(
-        `You bought ${quantity} of ${
-          selectedStock.stock_name
-        } for $${totalCost.toFixed(2)}`
-      );
+      toast.success(`You bought ${quantity} of ${selectedStock.stock_name} for $${totalCost.toFixed(2)}`);
     } catch (error) {
       console.error("Error buying stock:", error);
       alert("Failed to complete the transaction.");
@@ -111,16 +109,16 @@ const WatchlistComponent = () => {
   const handleRemoveFromWatchlist = async (stockId) => {
     try {
       await axios.delete(
-        `http://localhost:8080/api/users/${userId}/watchlist`,
+        `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/watchlist`,
         {
           data: { stockId },
         }
       );
       setStockIds((prev) => prev.filter((id) => id !== stockId));
-      alert("Stock removed from watchlist!");
+      toast.success("Stock removed from watchlist!");
     } catch (error) {
       console.error("Error removing from watchlist:", error);
-      alert("Failed to remove stock from watchlist.");
+      toast.error("Error removing the stock:", error);
     }
   };
 
@@ -268,6 +266,7 @@ const WatchlistComponent = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <ToastContainer />
     </Box>
   );
 };

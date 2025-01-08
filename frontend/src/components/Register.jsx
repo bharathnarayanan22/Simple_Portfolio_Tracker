@@ -30,39 +30,37 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
-    const apiUrl = isSignUp ? 'http://localhost:8080/api/auth/signup' : 'http://localhost:8080/api/auth/login';
+    const apiUrl = isSignUp ? 'https://simple-portfolio-tracker-1-durb.onrender.com/api/auth/signup' : 'https://simple-portfolio-tracker-1-durb.onrender.com/api/auth/login';
     const requestData = { name, email, phoneNumber, password };
     console.log(requestData);
-    setIsSubmitting(true); // Disable button while submitting
+    setIsSubmitting(true); 
 
     try {
       const response = await axios.post(apiUrl, requestData);
 
-      // Handling success response
       await toast.success(`${isSignUp ? 'Signup' : 'Login'} Successful`);
       
       if (isSignUp) {
         setFormData({ ...formData, isSignUp: false });
       } else {
-        const { id, name, token } = response.data; // Assuming server sends {id, name, token}
+        const { id, name, token } = response.data; 
         console.log('Server Response:', response.data);
 
         if (id && name && token) {
-          // Save user data in localStorage
-          localStorage.setItem('userId', id); // Save userId
-          localStorage.setItem('name', name); // Save user name
-          localStorage.setItem('token', token); // Save JWT token
+          localStorage.setItem('userId', id); 
+          localStorage.setItem('name', name); 
+          localStorage.setItem('token', token); 
         } else {
           console.error('Missing data in server response:', response.data);
         }
         
-        navigate('/dashboard'); // Redirect to dashboard
+        navigate('/dashboard'); 
       }
     } catch (error) {
       console.error(`${isSignUp ? 'Signup' : 'Login'} failed:`, error);
       toast.error(`${isSignUp ? 'Signup' : 'Login'} failed`);
     } finally {
-      setIsSubmitting(false); // Re-enable button after submission
+      setIsSubmitting(false); 
     }
   };
 

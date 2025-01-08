@@ -3,6 +3,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
+
 import com.example.backend.service.StockPriceService;
 
 @Configuration
@@ -12,7 +13,7 @@ public class StockPriceScheduler {
     @Autowired
     private StockPriceService stockPriceService;
 
-    @Scheduled(fixedRate = 3600000) // Every minute
+    @Scheduled(fixedRate = 600000) 
     public void updateStockPrices() {
         stockPriceService.generateStockPrices();
     }

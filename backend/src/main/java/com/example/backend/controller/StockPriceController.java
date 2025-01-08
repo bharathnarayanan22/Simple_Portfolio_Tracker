@@ -1,12 +1,16 @@
 package com.example.backend.controller;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.example.backend.model.StockPrice;
 import com.example.backend.service.StockPriceService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 
 @RestController
@@ -16,13 +20,11 @@ public class StockPriceController {
     @Autowired
     private StockPriceService stockPriceService;
 
-    // Get price history for a specific stock
     @GetMapping("/history/{stockId}")
     public List<StockPrice> getPriceHistory(@PathVariable Long stockId) {
         return stockPriceService.getPriceHistory(stockId);
     }
 
-    // Get the latest price for a specific stock
     @GetMapping("/latest/{stockId}")
     public StockPrice getLatestPrice(@PathVariable Long stockId) {
         return stockPriceService.getLatestPrice(stockId);
