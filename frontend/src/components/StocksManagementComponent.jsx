@@ -135,7 +135,7 @@ const StocksManagementComponent = ({
         });
         setFunds(funds - totalCost);
         toast.success(
-          `You bought ${quantity} of ${stock.name} for $${totalCost.toFixed(2)}`
+          `You bought ${quantity} of ${stock.stock_name} for $${totalCost.toFixed(2)}`
         );
       } catch (error) {
         console.error("Error buying stock:", error);
