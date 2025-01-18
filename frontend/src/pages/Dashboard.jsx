@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { styled, ThemeProvider, createTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import { useTheme } from "@mui/material";
@@ -27,6 +27,7 @@ import StocksManagementComponent from "../components/StocksManagementComponent";
 import PortfolioComponent from "../components/PortfolioComponent";
 import WatchlistComponent from "../components/WatchlistComponent";
 import TransactionsComponent from "../components/TransactionsComponent";
+import { AuthContext } from "../context/AuthContext.jsx";
 
 const drawerWidth = 240;
 const userName = localStorage.getItem("name");
@@ -57,7 +58,7 @@ const AppBar = styled(MuiAppBar, {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`, // Apply gradient here
+  background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`, 
   ...(open && {
     width: `calc(100% - ${drawerWidth}px)`,
     marginLeft: `${drawerWidth}px`,
@@ -80,8 +81,8 @@ export default function PortfolioTrackerDashboard() {
   const [open, setOpen] = useState(false);
   const [selectedView, setSelectedView] = useState("Overview");
   const [isBuying1, setIsBuying1] = useState(false);
+  const { isLoggedIn, logout } = useContext(AuthContext);
   const [view1, setView1] = useState("cards");
-
   const navigate = useNavigate();
   const theme = useTheme();
 
@@ -99,6 +100,8 @@ export default function PortfolioTrackerDashboard() {
 
   const handleHomeClick = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("name");
+    logout();
     navigate("/");
   };
 
@@ -138,10 +141,21 @@ export default function PortfolioTrackerDashboard() {
     backgroundColor: "#013d79",
     color: "white",
   };
+  console.log(`User ${userName}`)
 
   return (
     <ThemeProvider theme={theme}>
-      <Box sx={{ display: "flex", minHeight: "100vh" }}>
+      <Box
+        sx={{
+          display: "flex",
+          minHeight: "100vh",
+          backgroundImage: "url('src/assets/register_bg.jpg')", 
+          backgroundSize: "cover", 
+          backgroundPosition: "center", 
+          backgroundRepeat: "no-repeat", 
+          backgroundAttachment: "fixed",
+        }}
+      >
         <CssBaseline />
         <AppBar position="fixed" open={open}>
           <Toolbar>

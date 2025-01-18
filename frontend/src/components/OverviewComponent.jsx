@@ -11,8 +11,7 @@ import {
   List,
   ListItem,
   ListItemText,
-  Avatar,
-  CircularProgress,
+  Skeleton,
 } from "@mui/material";
 import PortfolioIcon from "@mui/icons-material/TrendingUp";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -27,7 +26,6 @@ import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import PropTypes from "prop-types";
 import axios from "axios";
 
-// Adding the Keyframes CSS animation
 import { keyframes } from "@mui/system";
 
 const scaleUp = keyframes`
@@ -39,7 +37,12 @@ const scaleUp = keyframes`
   }
 `;
 
-const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNavigateToTranscations, onNavigateToWatchlistUpdate }) => {
+const OverviewComponent = ({
+  onNavigateToPortfolio,
+  onNavigateToStocks,
+  onNavigateToTranscations,
+  onNavigateToWatchlistUpdate,
+}) => {
   const [overallTopStocks, setOverallTopStocks] = useState([]);
   const [myTopStocks, setMyTopStocks] = useState([]);
   const [recentTransactions, setRecentTransactions] = useState([]);
@@ -56,6 +59,8 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
   ]);
   const [loadingWatchlist, setLoadingWatchlist] = useState(true);
   const [errorWatchlist, setErrorWatchlist] = useState(null);
+  const [loading, setLoading] = useState(true); // Add loading state
+
 
   const userId = localStorage.getItem("userId");
 
@@ -63,7 +68,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
     const fetchData = async () => {
       try {
         const allStocksResponse = await axios.get(
-          "https://simple-portfolio-tracker-1-durb.onrender.com/stocks"
+          "http://localhost:8080/stocks"
         );
         const allStocks = allStocksResponse.data;
         const sortedOverallStocks = [...allStocks].sort(
@@ -72,7 +77,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
         setOverallTopStocks(sortedOverallStocks.slice(0, 3));
 
         const portfolioResponse = await axios.get(
-          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/portfolio`
+          `http://localhost:8080/api/users/${userId}/portfolio`
         );
         const portfolioData = portfolioResponse.data;
 
@@ -98,7 +103,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
         setMyTopStocks(sortedMyStocks.slice(0, 3));
 
         const transactionsResponse = await axios.get(
-          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/transactions`
+          `http://localhost:8080/api/users/${userId}/transactions`
         );
         const transactions = transactionsResponse.data;
 
@@ -108,6 +113,8 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
         setRecentTransactions(sortedTransactions.slice(0, 3));
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -118,13 +125,13 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
     const fetchWatchlistUpdates = async () => {
       try {
         const watchlistResponse = await axios.get(
-          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/watchlist`
+          `http://localhost:8080/api/users/${userId}/watchlist`
         );
         const watchlistStocks = watchlistResponse.data;
 
         const stockDetails = await Promise.all(
           watchlistStocks.map((stock) =>
-            axios.get(`https://simple-portfolio-tracker-1-durb.onrender.com/stocks/${stock}`)
+            axios.get(`http://localhost:8080/stocks/${stock}`)
           )
         );
 
@@ -206,31 +213,55 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
 
       <Divider sx={{ mb: 2 }} />
 
+      {/* Main Content */}
+      {loading ? (
+        <Grid container spacing={4}>
+          <Grid item xs={12} sm={6}>
+            <Skeleton variant="rectangular" height={200} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Skeleton variant="rectangular" height={200} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Skeleton variant="rectangular" height={200} />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Skeleton variant="rectangular" height={200} />
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <Skeleton variant="rectangular" height={100} />
+          </Grid>
+          <Grid item xs={12} sm={12}>
+            <Skeleton variant="rectangular" height={100} />
+          </Grid>
+        </Grid>
+      ) : (
+
       <Grid>
         <Grid container spacing={5} sx={{ mb: "4%" }}>
           {/* Overall Stocks Performance */}
           <Grid item xs={12} sm={6}>
             <Card
               sx={{
-                bgcolor: "#FFFFFF", 
-                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", 
+                bgcolor: "#FFFFFF",
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
                 borderRadius: 3,
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   transform: "scale(1.05)",
-                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", 
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)",
                 },
               }}
             >
               {/* Upper Section */}
               <Box
                 sx={{
-                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", 
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)",
                   color: "#FFFFFF",
                   padding: 3,
-                  borderRadius: "12px 12px 0 0", 
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)", 
-                  position: "relative", 
+                  borderRadius: "12px 12px 0 0",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                  position: "relative",
                   overflow: "hidden",
                 }}
               >
@@ -241,8 +272,8 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                     fontWeight: "bold",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-between", 
-                    marginBottom: 0, 
+                    justifyContent: "space-between",
+                    marginBottom: 0,
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -357,21 +388,21 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
           <Grid item xs={12} sm={6}>
             <Card
               sx={{
-                bgcolor: "#FFFFFF", 
-                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", 
+                bgcolor: "#FFFFFF",
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
                 borderRadius: 3,
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   transform: "scale(1.05)",
-                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", 
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)",
                 },
               }}
             >
               {/* Upper Section */}
               <Box
                 sx={{
-                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", 
-                  color: "#FFFFFF", 
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)",
+                  color: "#FFFFFF",
                   padding: 3,
                   borderTopLeftRadius: 3,
                   borderTopRightRadius: 3,
@@ -384,8 +415,8 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                     fontWeight: "bold",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-between", 
-                    marginBottom: 0, 
+                    justifyContent: "space-between",
+                    marginBottom: 0,
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -424,74 +455,89 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
 
               {/* Lower Section */}
               <CardContent sx={{ padding: 3 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    gap: 2,
-                  }}
-                >
-                  {myTopStocks.slice(0, 3).map((stock, index) => (
-                    <Box
-                      key={stock.stockId}
-                      sx={{
-                        textAlign: "center",
-                        transition: "transform 0.3s ease",
-                        "&:hover": {
-                          transform: "scale(1.1)",
-                        },
-                      }}
-                    >
-                      {/* Animated Icons with Pulse Effect */}
+                {myTopStocks.length > 0 ? (
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent:
+                        myTopStocks.length === 1 ? "center" : "space-between",
+                      alignItems: "center",
+                      gap: 2,
+                    }}
+                  >
+                    {myTopStocks.slice(0, 3).map((stock, index) => (
                       <Box
+                        key={stock.stockId}
                         sx={{
-                          fontSize: "3rem",
-                          color:
-                            index === 0
-                              ? "#FFD700" 
-                              : index === 1
-                              ? "#C0C0C0" 
-                              : "#CD7F32",
-                          animation: "pulse 1.5s infinite",
-                          "@keyframes pulse": {
-                            "0%, 100%": {
-                              transform: "scale(1)",
-                            },
-                            "50%": {
-                              transform: "scale(1.1)",
-                            },
+                          textAlign: "center",
+                          transition: "transform 0.3s ease",
+                          "&:hover": {
+                            transform: "scale(1.1)",
                           },
                         }}
                       >
-                        {index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"}
-                      </Box>
+                        {/* Animated Icons with Pulse Effect */}
+                        <Box
+                          sx={{
+                            fontSize: "3rem",
+                            color:
+                              index === 0
+                                ? "#FFD700"
+                                : index === 1
+                                ? "#C0C0C0"
+                                : "#CD7F32",
+                            animation: "pulse 1.5s infinite",
+                            "@keyframes pulse": {
+                              "0%, 100%": {
+                                transform: "scale(1)",
+                              },
+                              "50%": {
+                                transform: "scale(1.1)",
+                              },
+                            },
+                          }}
+                        >
+                          {index === 0 ? "🥇" : index === 1 ? "🥈" : "🥉"}
+                        </Box>
 
-                      {/* Stock Details */}
-                      <Typography
-                        variant="body1"
-                        sx={{
-                          color: "#2C3E50", 
-                          fontWeight: "bold",
-                          mt: 1,
-                        }}
-                      >
-                        {stock.name} ({stock.ticker})
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{
-                          color: stock.profitLoss >= 0 ? "#27AE60" : "#E74C3C", 
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {stock.profitLoss >= 0
-                          ? `+${stock.profitLoss.toFixed(2)}`
-                          : `${stock.profitLoss.toFixed(2)}`}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
+                        {/* Stock Details */}
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            color: "#2C3E50",
+                            fontWeight: "bold",
+                            mt: 1,
+                          }}
+                        >
+                          {stock.name} ({stock.ticker})
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color:
+                              stock.profitLoss >= 0 ? "#27AE60" : "#E74C3C",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {stock.profitLoss >= 0
+                            ? `+${stock.profitLoss.toFixed(2)}`
+                            : `${stock.profitLoss.toFixed(2)}`}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                ) : (
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      color: "#7F8C8D",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                    }}
+                  >
+                    You have no stocks to display.
+                  </Typography>
+                )}
               </CardContent>
             </Card>
           </Grid>
@@ -506,15 +552,15 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   transform: "scale(1.02)",
-                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", 
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)",
                 },
               }}
             >
               {/* Upper Section */}
               <Box
                 sx={{
-                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", 
-                  color: "#FFFFFF", 
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)",
+                  color: "#FFFFFF",
                   padding: 3,
                   borderTopLeftRadius: 3,
                   borderTopRightRadius: 3,
@@ -527,8 +573,8 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                     fontWeight: "bold",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-between", 
-                    marginBottom: 0, 
+                    justifyContent: "space-between",
+                    marginBottom: 0,
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -567,77 +613,91 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
 
               {/* Lower Section */}
               <CardContent sx={{ padding: 3 }}>
-                <List>
-                  {recentTransactions.map((transaction, index) => (
-                    <ListItem
-                      key={index}
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        mb: 2,
-                        padding: 2,
-                        borderRadius: 2,
-                        backgroundColor: "#F5F5F5", 
-                        transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                        "&:hover": {
-                          transform: "translateX(10px)", 
-                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", 
-                        },
-                      }}
-                    >
-                      {/* Transaction Icon */}
-                      <Box
+                {recentTransactions.length > 0 ? (
+                  <List>
+                    {recentTransactions.map((transaction, index) => (
+                      <ListItem
+                        key={index}
                         sx={{
-                          bgcolor:
-                            transaction.action === "Buy"
-                              ? "#27AE60"
-                              : "#E74C3C", 
-                          color: "#FFFFFF",
-                          borderRadius: "50%",
-                          width: 40,
-                          height: 40,
                           display: "flex",
                           alignItems: "center",
-                          justifyContent: "center",
-                          mr: 2,
+                          mb: 2,
+                          padding: 2,
+                          borderRadius: 2,
+                          backgroundColor: "#F5F5F5",
+                          transition:
+                            "transform 0.3s ease, box-shadow 0.3s ease",
+                          "&:hover": {
+                            transform: "translateX(10px)",
+                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                          },
                         }}
                       >
-                        {transaction.action === "Buy" ? (
-                          <ShoppingCartIcon fontSize="small" />
-                        ) : (
-                          <SellIcon fontSize="small" />
-                        )}
-                      </Box>
+                        {/* Transaction Icon */}
+                        <Box
+                          sx={{
+                            bgcolor:
+                              transaction.action === "Buy"
+                                ? "#27AE60"
+                                : "#E74C3C",
+                            color: "#FFFFFF",
+                            borderRadius: "50%",
+                            width: 40,
+                            height: 40,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            mr: 2,
+                          }}
+                        >
+                          {transaction.action === "Buy" ? (
+                            <ShoppingCartIcon fontSize="small" />
+                          ) : (
+                            <SellIcon fontSize="small" />
+                          )}
+                        </Box>
 
-                      {/* Transaction Details */}
-                      <ListItemText
-                        primary={
-                          <Typography
-                            variant="body1"
-                            sx={{
-                              fontWeight: "bold",
-                              color: "#2C3E50",
-                            }}
-                          >
-                            {transaction.action} {transaction.quantity} shares
-                            of {transaction.ticker}
-                          </Typography>
-                        }
-                        secondary={
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              color: "#7F8C8D", 
-                            }}
-                          >
-                            Date:{" "}
-                            {new Date(transaction.date).toLocaleDateString()}
-                          </Typography>
-                        }
-                      />
-                    </ListItem>
-                  ))}
-                </List>
+                        {/* Transaction Details */}
+                        <ListItemText
+                          primary={
+                            <Typography
+                              variant="body1"
+                              sx={{
+                                fontWeight: "bold",
+                                color: "#2C3E50",
+                              }}
+                            >
+                              {transaction.action} {transaction.quantity} shares
+                              of {transaction.ticker}
+                            </Typography>
+                          }
+                          secondary={
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: "#7F8C8D",
+                              }}
+                            >
+                              Date:{" "}
+                              {new Date(transaction.date).toLocaleDateString()}
+                            </Typography>
+                          }
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                ) : (
+                  <Typography
+                    variant="body1"
+                    sx={{
+                      textAlign: "center",
+                      color: "#7F8C8D",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    No recent transactions available
+                  </Typography>
+                )}
               </CardContent>
             </Card>
           </Grid>
@@ -646,20 +706,20 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
           <Grid item xs={12} sm={6}>
             <Card
               sx={{
-                bgcolor: "#FFFFFF", 
-                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", 
+                bgcolor: "#FFFFFF",
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
                 borderRadius: 3,
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   transform: "scale(1.02)",
-                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", 
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)",
                 },
               }}
             >
               {/* Upper Section */}
               <Box
                 sx={{
-                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", 
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)",
                   color: "#FFFFFF",
                   padding: 3,
                   borderTopLeftRadius: 3,
@@ -693,18 +753,18 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                         mb: 2,
                         padding: 2,
                         borderRadius: 2,
-                        backgroundColor: "#F5F5F5", 
+                        backgroundColor: "#F5F5F5",
                         transition: "transform 0.3s ease, box-shadow 0.3s ease",
                         "&:hover": {
-                          transform: "translateX(10px)", 
-                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", 
+                          transform: "translateX(10px)",
+                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
                         },
                       }}
                     >
                       {/* Notification Icon */}
                       <Box
                         sx={{
-                          bgcolor: "#FFC107", 
+                          bgcolor: "#FFC107",
                           color: "#FFFFFF",
                           borderRadius: "50%",
                           width: 40,
@@ -726,7 +786,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                             variant="body1"
                             sx={{
                               fontWeight: "bold",
-                              color: "#2C3E50", 
+                              color: "#2C3E50",
                             }}
                           >
                             {notification}
@@ -747,21 +807,21 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
           <Grid item xs={12}>
             <Card
               sx={{
-                bgcolor: "#FFFFFF", 
-                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", 
+                bgcolor: "#FFFFFF",
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
                 borderRadius: 3,
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   transform: "scale(1.02)",
-                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", 
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)",
                 },
               }}
             >
               {/* Upper Section */}
               <Box
                 sx={{
-                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", 
-                  color: "#FFFFFF", 
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)",
+                  color: "#FFFFFF",
                   padding: 3,
                   borderTopLeftRadius: 3,
                   borderTopRightRadius: 3,
@@ -794,18 +854,18 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                         mb: 2,
                         padding: 2,
                         borderRadius: 2,
-                        backgroundColor: "#F5F5F5", 
+                        backgroundColor: "#F5F5F5",
                         transition: "transform 0.3s ease, box-shadow 0.3s ease",
                         "&:hover": {
                           transform: "translateX(10px)",
-                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", 
+                          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
                         },
                       }}
                     >
                       {/* News Icon */}
                       <Box
                         sx={{
-                          bgcolor: "#2196F3", 
+                          bgcolor: "#2196F3",
                           color: "#FFFFFF",
                           borderRadius: "50%",
                           width: 40,
@@ -816,7 +876,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                           mr: 2,
                         }}
                       >
-                        <NewspaperIcon fontSize="small" /> 
+                        <NewspaperIcon fontSize="small" />
                       </Box>
 
                       {/* News Details */}
@@ -826,7 +886,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                             variant="body1"
                             sx={{
                               fontWeight: "bold",
-                              color: "#2C3E50", 
+                              color: "#2C3E50",
                             }}
                           >
                             {newsItem}
@@ -844,21 +904,21 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
           <Grid item xs={12}>
             <Card
               sx={{
-                bgcolor: "#FFFFFF", 
-                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)", 
+                bgcolor: "#FFFFFF",
+                boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
                 borderRadius: 3,
                 transition: "transform 0.3s ease, box-shadow 0.3s ease",
                 "&:hover": {
                   transform: "scale(1.02)",
-                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)", 
+                  boxShadow: "0px 8px 30px rgba(0, 0, 0, 0.2)",
                 },
               }}
             >
               {/* Upper Section */}
               <Box
                 sx={{
-                  background: "linear-gradient(135deg, #6A11CB, #2575FC)", 
-                  color: "#FFFFFF", 
+                  background: "linear-gradient(135deg, #6A11CB, #2575FC)",
+                  color: "#FFFFFF",
                   padding: 3,
                   borderTopLeftRadius: 3,
                   borderTopRightRadius: 3,
@@ -871,8 +931,8 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                     fontWeight: "bold",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-between", 
-                    marginBottom: 0, 
+                    justifyContent: "space-between",
+                    marginBottom: 0,
                   }}
                 >
                   <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -922,19 +982,19 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                           mb: 2,
                           padding: 2,
                           borderRadius: 2,
-                          backgroundColor: "#F5F5F5", 
+                          backgroundColor: "#F5F5F5",
                           transition:
                             "transform 0.3s ease, box-shadow 0.3s ease",
                           "&:hover": {
-                            transform: "translateX(10px)", 
-                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", 
+                            transform: "translateX(10px)",
+                            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
                           },
                         }}
                       >
                         {/* Stock Icon */}
                         <Box
                           sx={{
-                            bgcolor: "#E74C3C", 
+                            bgcolor: "#E74C3C",
                             color: "#FFFFFF",
                             borderRadius: "50%",
                             width: 40,
@@ -956,7 +1016,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                               variant="body1"
                               sx={{
                                 fontWeight: "bold",
-                                color: "#2C3E50", 
+                                color: "#2C3E50",
                               }}
                             >
                               {stock.stock_name} ({stock.ticker})
@@ -966,7 +1026,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                             <Typography
                               variant="body2"
                               sx={{
-                                color: "#7F8C8D", 
+                                color: "#7F8C8D",
                               }}
                             >
                               Price Decrease: {Math.abs(stock.percentageChange)}
@@ -981,7 +1041,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
                   <Typography
                     variant="body1"
                     sx={{
-                      color: "#7F8C8D", 
+                      color: "#7F8C8D",
                       textAlign: "center",
                       mt: 2,
                     }}
@@ -994,6 +1054,7 @@ const OverviewComponent = ({ onNavigateToPortfolio, onNavigateToStocks, onNaviga
           </Grid>
         </Grid>
       </Grid>
+      )}
     </Box>
   );
 };

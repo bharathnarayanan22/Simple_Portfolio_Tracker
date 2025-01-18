@@ -18,6 +18,7 @@ import {
   TableRow,
   IconButton,
   Modal,
+  Skeleton,
 } from "@mui/material";
 import { Star, StarBorder } from "@mui/icons-material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -47,7 +48,7 @@ const StocksManagementComponent = ({
   const [ownedStocks, setOwnedStocks] = useState([]);
   const [watchlist, setWatchlist] = useState([]);
   const [funds, setFunds] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [quantities, setQuantities] = useState({});
@@ -67,24 +68,24 @@ const StocksManagementComponent = ({
     const fetchData = async () => {
       try {
         const fundsResponse = await axios.get(
-          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/funds`
+          `http://localhost:8080/api/users/${userId}/funds`
         );
         setFunds(fundsResponse.data);
 
-        const stocksResponse = await axios.get("https://simple-portfolio-tracker-1-durb.onrender.com/stocks");
+        const stocksResponse = await axios.get("http://localhost:8080/stocks");
         const initialStocks = stocksResponse.data.map((stock) => ({
           ...stock,
-          price: generateRandomPrice(stock.price || 100), // Add initial price if not present
+          price: generateRandomPrice(stock.price || 100),
         }));
         setStocks(initialStocks);
 
         const ownedStocksResponse = await axios.get(
-          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/stocks`
+          `http://localhost:8080/api/users/${userId}/stocks`
         );
         setOwnedStocks(ownedStocksResponse.data);
 
         const response = await axios.get(
-          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/portfolio`
+          `http://localhost:8080/api/users/${userId}/portfolio`
         );
         const portfolioData = response.data;
 
@@ -96,11 +97,13 @@ const StocksManagementComponent = ({
         setPortfolio(updatedData);
 
         const watchlistResponse = await axios.get(
-          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/watchlist`
+          `http://localhost:8080/api/users/${userId}/watchlist`
         );
         setWatchlist(watchlistResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -112,7 +115,7 @@ const StocksManagementComponent = ({
       setStocks((prevStocks) =>
         prevStocks.map((stock) => ({
           ...stock,
-          price: generateRandomPrice(stock.price), 
+          price: generateRandomPrice(stock.price),
         }))
       );
     }, 5000);
@@ -127,7 +130,7 @@ const StocksManagementComponent = ({
     if (funds >= totalCost) {
       setLoading(true);
       try {
-        await axios.post(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/buyStock`, {
+        await axios.post(`http://localhost:8080/api/users/${userId}/buyStock`, {
           stockName: stock.stock_name,
           ticker: stock.ticker,
           price: stock.price,
@@ -135,7 +138,9 @@ const StocksManagementComponent = ({
         });
         setFunds(funds - totalCost);
         toast.success(
-          `You bought ${quantity} of ${stock.stock_name} for $${totalCost.toFixed(2)}`
+          `You bought ${quantity} of ${
+            stock.stock_name
+          } for $${totalCost.toFixed(2)}`
         );
       } catch (error) {
         console.error("Error buying stock:", error);
@@ -150,7 +155,7 @@ const StocksManagementComponent = ({
 
   const handleAddToWatchlist = async (stock) => {
     try {
-      await axios.post(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/watchlist`, {
+      await axios.post(`http://localhost:8080/api/users/${userId}/watchlist`, {
         stockId: stock.id,
       });
       setWatchlist((prev) => [...prev, stock.id]);
@@ -164,7 +169,7 @@ const StocksManagementComponent = ({
   const handleRemoveFromWatchlist = async (stockId) => {
     try {
       await axios.delete(
-        `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/watchlist`,
+        `http://localhost:8080/api/users/${userId}/watchlist`,
         {
           data: { stockId },
         }
@@ -179,7 +184,7 @@ const StocksManagementComponent = ({
 
   const handleSellClick = (stock) => {
     setSelectedStock(stock);
-    setOpenModal(true); 
+    setOpenModal(true);
   };
 
   const handleSell = async () => {
@@ -192,7 +197,7 @@ const StocksManagementComponent = ({
       setLoading(true);
       try {
         await axios.post(
-          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/sellStock`,
+          `http://localhost:8080/api/users/${userId}/sellStock`,
           {
             stockId: selectedStock.id,
             quantity: quantityToSell,
@@ -221,8 +226,8 @@ const StocksManagementComponent = ({
         toast.error("Failed to sell stock.");
       } finally {
         setLoading(false);
-        setOpenModal(false); 
-        setQuantityToSell(0); 
+        setOpenModal(false);
+        setQuantityToSell(0);
       }
     } else {
       alert("Invalid quantity for selling. Please enter a valid amount.");
@@ -246,8 +251,8 @@ const StocksManagementComponent = ({
             stock.price <= priceRange[1]
         )
       : portfolio.map((ownedStock) => ({
-          ...ownedStock, 
-          price: generateRandomPrice(ownedStock.purchase_price), 
+          ...ownedStock,
+          price: generateRandomPrice(ownedStock.purchase_price),
         }));
 
   return (
@@ -267,7 +272,7 @@ const StocksManagementComponent = ({
               component="img"
               alt="Buy Stocks Image"
               height="200"
-              image= {buy}
+              image={buy}
             />
             <CardContent>
               <Typography gutterBottom variant="h5" component="div">
@@ -337,7 +342,7 @@ const StocksManagementComponent = ({
               variant="h4"
               sx={{
                 fontWeight: "bold",
-                color: "primary.main", 
+                color: "primary.main",
                 mb: 2,
               }}
             >
@@ -506,55 +511,74 @@ const StocksManagementComponent = ({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {portfolio.map((stock) => (
-                    <TableRow
-                      key={stock.id}
-                      sx={{
-                        "&:nth-of-type(odd)": {
-                          backgroundColor: (theme) =>
-                            theme.palette.action.hover,
-                        },
-                        "&:hover": {
-                          backgroundColor: (theme) =>
-                            theme.palette.action.selected,
-                          cursor: "pointer",
-                        },
-                      }}
-                    >
-                      <TableCell>{stock.stockName}</TableCell>
-                      <TableCell>{stock.ticker}</TableCell>
-                      <TableCell>{stock.quantity}</TableCell>
-                      <TableCell>${stock.purchasePrice.toFixed(2)}</TableCell>
-                      <TableCell>${stock.currentPrice.toFixed(2)}</TableCell>
-                      <TableCell>
-                        ${(stock.currentPrice * stock.quantity).toFixed(2)}
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          color:
-                            stock.currentPrice >= stock.purchasePrice
-                              ? "green"
-                              : "red",
-                        }}
-                      >
-                        $
-                        {(
-                          (stock.currentPrice - stock.purchasePrice) *
-                          stock.quantity
-                        ).toFixed(2)}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          onClick={() => handleSellClick(stock)}
-                          disabled={loading || stock.quantity === 0}
-                        >
-                          {loading ? <CircularProgress size={24} /> : "Sell"}
-                        </Button>
+                  {loading ? (
+                    Array.from({ length: 5 }).map((_, index) => (
+                      <TableRow key={index}>
+                        <TableCell colSpan={8}>
+                          <Skeleton animation="wave" height={50} />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (portfolio.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} align="center">
+                        <Typography variant="h6" color="textSecondary">
+                          No stocks available to sell.
+                        </Typography>
                       </TableCell>
                     </TableRow>
-                  ))}
+                  ) : (
+                    portfolio.map((stock) => (
+                      <TableRow
+                        key={stock.id}
+                        sx={{
+                          "&:nth-of-type(odd)": {
+                            backgroundColor: (theme) =>
+                              theme.palette.action.hover,
+                          },
+                          "&:hover": {
+                            backgroundColor: (theme) =>
+                              theme.palette.action.selected,
+                            cursor: "pointer",
+                          },
+                        }}
+                      >
+                        <TableCell>{stock.stockName}</TableCell>
+                        <TableCell>{stock.ticker}</TableCell>
+                        <TableCell>{stock.quantity}</TableCell>
+                        <TableCell>${stock.purchasePrice.toFixed(2)}</TableCell>
+                        <TableCell>${stock.currentPrice.toFixed(2)}</TableCell>
+                        <TableCell>
+                          ${(stock.currentPrice * stock.quantity).toFixed(2)}
+                        </TableCell>
+                        <TableCell
+                          style={{
+                            color:
+                              stock.currentPrice >= stock.purchasePrice
+                                ? "green"
+                                : "red",
+                          }}
+                        >
+                          $
+                          {(
+                            (stock.currentPrice - stock.purchasePrice) *
+                            stock.quantity
+                          ).toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={() => handleSellClick(stock)}
+                            disabled={loading || stock.quantity === 0}
+                          >
+                            {loading ? <CircularProgress size={24} /> : "Sell"}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ))
+                  }
                 </TableBody>
               </Table>
             </TableContainer>

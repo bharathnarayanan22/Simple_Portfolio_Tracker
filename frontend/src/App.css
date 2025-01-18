@@ -2,3 +2,12 @@ html, body {
     margin: 0%;
     padding: 0%;
 }
+
+.slick-slide {
+    transition: transform 0.2s ease-in-out;
+  }
+  .slick-track {
+    display: flex;
+    align-items: center;
+  }
+  
