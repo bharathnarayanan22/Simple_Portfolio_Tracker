@@ -20,12 +20,19 @@ public class StockPriceService {
     @Autowired
     private StockPriceRepository stockPriceRepository;
 
+    @Autowired
+    private UserService userService;
+
+    public List<Long> getAllUserIds() {
+        return userService.getAllUserIds();
+    }
 
     public void generateStockPrices() {
         List<Stock> stocks = stockRepository.findAll();
         for (Stock stock : stocks) {
             StockPrice stockPrice = new StockPrice();
             stockPrice.setStock(stock);
+            stockPrice.setTicker(stock.getTicker()); 
 
             double randomChange = stock.getPrice() * (Math.random() * 0.05 - 0.025); 
             double newPrice = Math.max(stock.getPrice() + randomChange, 0); 

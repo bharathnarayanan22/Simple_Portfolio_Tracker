@@ -23,9 +23,11 @@ import {
   Select,
   InputLabel,
   FormControl,
+  InputAdornment,
 } from "@mui/material";
 import axios from "axios";
 import dayjs from "dayjs";
+import SearchIcon from "@mui/icons-material/Search";
 import ReceiptIcon from "@mui/icons-material/Receipt";
 import DownloadIcon from "@mui/icons-material/Download";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
@@ -106,7 +108,7 @@ const TransactionsComponent = () => {
         );
       }
 
-      setFilteredTransactions(filtered); // Update filteredTransactions
+      setFilteredTransactions(filtered); 
     };
 
     applyFilters();
@@ -356,85 +358,94 @@ const TransactionsComponent = () => {
       </Grid>
 
       <Grid
-  container
-  spacing={2}
-  sx={{
-    mb: 4,
-    justifyContent: "flex-end", // Align filters to the corner
-    alignItems: "center", // Align items vertically
+        container
+        spacing={2}
+        sx={{
+          mb: 4,
+          justifyContent: "flex-end",
+          alignItems: "center",
+        }}
+      >
+        {/* Search Field */}
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            label="Search"
+            variant="outlined"
+            size="small"
+            onChange={handleSearchChange}
+            value={searchText}
+            sx={{
+              bgcolor: "#ffffff", 
+              borderRadius: 1,
+              width: "100%"
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Grid>
 
-  }}
->
-  {/* Search Field */}
-  <Grid item xs={12} sm={6} md={3}>
-    <TextField
-      size="small"
-      label="Search"
-      placeholder="Stock Name or Ticker"
-      variant="outlined"
-      value={searchText}
-      onChange={handleSearchChange}
-      sx={{
-        bgcolor: "#ffffff", // White background for field
-        borderRadius: 1,
-      }}
-    />
-  </Grid>
+        {/* Filter by Action */}
+        <Grid item xs={12} sm={6} md={3}>
+          <FormControl
+            fullWidth
+            size="small"
+            sx={{
+              bgcolor: "#ffffff", 
+              borderRadius: 1,
+            }}
+          >
+            <InputLabel>Action</InputLabel>
+            <Select
+              value={actionFilter}
+              onChange={handleFilterChange}
+              label="Action"
+            >
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="BUY">BUY</MenuItem>
+              <MenuItem value="SELL">SELL</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
 
-  {/* Filter by Action */}
-  <Grid item xs={12} sm={6} md={3}>
-    <FormControl
-      fullWidth
-      size="small"
-      sx={{
-        bgcolor: "#ffffff", // White background
-        borderRadius: 1,
-      }}
-    >
-      <InputLabel>Action</InputLabel>
-      <Select value={actionFilter} onChange={handleFilterChange} label="Action">
-        <MenuItem value="">All</MenuItem>
-        <MenuItem value="BUY">BUY</MenuItem>
-        <MenuItem value="SELL">SELL</MenuItem>
-      </Select>
-    </FormControl>
-  </Grid>
+        {/* Filter by Start Date */}
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            size="small"
+            type="date"
+            label="Start Date"
+            InputLabelProps={{ shrink: true }}
+            value={startDate ? dayjs(startDate).format("YYYY-MM-DD") : ""}
+            onChange={(e) => handleDateChange("start", e.target.value)}
+            fullWidth
+            sx={{
+              bgcolor: "#ffffff", // White background
+              borderRadius: 1,
+            }}
+          />
+        </Grid>
 
-  {/* Filter by Start Date */}
-  <Grid item xs={12} sm={6} md={3}>
-    <TextField
-      size="small"
-      type="date"
-      label="Start Date"
-      InputLabelProps={{ shrink: true }}
-      value={startDate ? dayjs(startDate).format("YYYY-MM-DD") : ""}
-      onChange={(e) => handleDateChange("start", e.target.value)}
-      fullWidth
-      sx={{
-        bgcolor: "#ffffff", // White background
-        borderRadius: 1,
-      }}
-    />
-  </Grid>
-
-  {/* Filter by End Date */}
-  <Grid item xs={12} sm={6} md={3}>
-    <TextField
-      size="small"
-      type="date"
-      label="End Date"
-      InputLabelProps={{ shrink: true }}
-      value={endDate ? dayjs(endDate).format("YYYY-MM-DD") : ""}
-      onChange={(e) => handleDateChange("end", e.target.value)}
-      fullWidth
-      sx={{
-        bgcolor: "#ffffff", // White background
-        borderRadius: 1,
-      }}
-    />
-  </Grid>
-</Grid>
-
+        {/* Filter by End Date */}
+        <Grid item xs={12} sm={6} md={3}>
+          <TextField
+            size="small"
+            type="date"
+            label="End Date"
+            InputLabelProps={{ shrink: true }}
+            value={endDate ? dayjs(endDate).format("YYYY-MM-DD") : ""}
+            onChange={(e) => handleDateChange("end", e.target.value)}
+            fullWidth
+            sx={{
+              bgcolor: "#ffffff", // White background
+              borderRadius: 1,
+            }}
+          />
+        </Grid>
+      </Grid>
 
       {/* Transactions Table */}
       <TableContainer

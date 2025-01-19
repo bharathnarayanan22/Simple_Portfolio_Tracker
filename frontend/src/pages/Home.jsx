@@ -65,19 +65,19 @@ const Home = () => {
             <Typography
               variant="h3"
               gutterBottom
-              sx={{ fontWeight: 700, animation: `${fadeIn} 1s ease-in-out` }}
+              sx={{ fontWeight: 700, animation: `${fadeIn} 1s ease-in-out`, textAlign: 'center'}}
             >
               Welcome to Portfolio Tracker
             </Typography>
             <Typography
               variant="h6"
               gutterBottom
-              sx={{ animation: `${fadeIn} 1.5s ease-in-out` }}
+              sx={{ animation: `${fadeIn} 1.5s ease-in-out`, textAlign: 'center' }}
             >
               Your ultimate tool to manage and track your investments.
             </Typography>
             <Box
-              sx={{ mt: 3, ml: "20%", animation: `${fadeIn} 2s ease-in-out` }}
+              sx={{ mt: 3, animation: `${fadeIn} 2s ease-in-out`, textAlign: 'center'}}
             >
               {!isLoggedIn ? (
                 <Button

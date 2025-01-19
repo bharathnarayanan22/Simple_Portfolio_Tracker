@@ -21,6 +21,7 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import PortfolioIcon from "@mui/icons-material/AccountBalance";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import TransactionIcon from "@mui/icons-material/AccountTree";
+import { BusinessCenter as StocksIcon} from '@mui/icons-material';
 
 import OverviewComponent from "../components/OverviewComponent";
 import StocksManagementComponent from "../components/StocksManagementComponent";
@@ -222,7 +223,7 @@ export default function PortfolioTrackerDashboard() {
                   ...(selectedView === "Stocks Management" && selectedStyle),
                 }}
               >
-                <PortfolioIcon />
+                <StocksIcon  />
                 <ListItemText primary="Stocks Management" />
               </ListItemButton>
               <ListItemButton

@@ -31,4 +31,6 @@ public interface UserService {
 
     void removeStockFromWatchlist(Long userId, WatchlistRequest watchlistRequest);
     List<Long> getStockIdsByUserId(Long userId);
+
+    List<Long> getAllUserIds();
 }

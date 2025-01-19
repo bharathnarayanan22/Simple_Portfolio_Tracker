@@ -258,7 +258,7 @@ const StocksManagementComponent = ({
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {view === "cards" && view1 === "cards" && (
-        <Box sx={{ display: "flex", gap: 4, justifyContent: "center", mt: 8 }}>
+        <Box sx={{ display: "flex", gap: 4, justifyContent: "center", mt: 3 }}>
           <Card
             sx={{
               width: "45%",
@@ -271,7 +271,7 @@ const StocksManagementComponent = ({
             <CardMedia
               component="img"
               alt="Buy Stocks Image"
-              height="200"
+              height="300"
               image={buy}
             />
             <CardContent>
@@ -308,7 +308,7 @@ const StocksManagementComponent = ({
             <CardMedia
               component="img"
               alt="Sell Stocks Image"
-              height="200"
+              height="300"
               image={sell}
             />
             <CardContent>

@@ -17,7 +17,15 @@ import {
   DialogTitle,
   Skeleton,
   Divider,
+  Tooltip,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import SearchIcon from "@mui/icons-material/Search";
+import SortIcon from "@mui/icons-material/Sort";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { Undo, ShoppingCart } from "@mui/icons-material";
 import StarIcon from "@mui/icons-material/Star";
 import { ToastContainer, toast } from "react-toastify";
@@ -35,6 +43,7 @@ const WatchlistComponent = () => {
   const [selectedStock, setSelectedStock] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const userId = localStorage.getItem("userId");
+  const [filteredStocks, setFilteredStocks] = useState([]);
 
   useEffect(() => {
     const fetchWatchlist = async () => {
@@ -68,6 +77,7 @@ const WatchlistComponent = () => {
           };
         });
         setStocks(enrichedStocks);
+        setFilteredStocks(enrichedStocks);
       } catch (err) {
         setError("Failed to fetch stock details");
       } finally {
@@ -79,6 +89,35 @@ const WatchlistComponent = () => {
       fetchStocks();
     }
   }, [stockIds]);
+
+  // Filtering Handlers
+  const handleSearch = (searchValue) => {
+    const filtered = stocks.filter((stock) =>
+      stock.stock_name.toLowerCase().includes(searchValue.toLowerCase())
+    );
+    setFilteredStocks(filtered);
+  };
+
+  const handleSortByPrice = () => {
+    const sorted = [...filteredStocks].sort(
+      (a, b) => b.currentPrice - a.currentPrice
+    );
+    setFilteredStocks(sorted);
+  };
+
+  const handleFilterIncrease = () => {
+    const gainers = stocks.filter((stock) => stock.currentPrice > stock.price);
+    setFilteredStocks(gainers);
+  };
+
+  const handleFilterDecrease = () => {
+    const losers = stocks.filter((stock) => stock.currentPrice <= stock.price);
+    setFilteredStocks(losers);
+  };
+
+  const resetFilters = () => {
+    setFilteredStocks(stocks);
+  };
 
   const handleOpenBuyDialog = (stock) => {
     setSelectedStock(stock);
@@ -220,49 +259,77 @@ const WatchlistComponent = () => {
             label="Search by Name"
             variant="outlined"
             size="small"
-            onChange={(e) => {
-              const searchValue = e.target.value.toLowerCase();
-              setStocks((stocks) =>
-                stocks.filter((stock) =>
-                  stock.stock_name.toLowerCase().includes(searchValue)
-                )
-              );
-            }}
+            onChange={(e) => handleSearch(e.target.value)}
             sx={{ width: 200 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
           />
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => {
-              setStocks((prevStocks) =>
-                prevStocks.sort((a, b) => b.currentPrice - a.currentPrice)
-              );
-            }}
-          >
-            Sort by Price
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => {
-              setStocks((prevStocks) =>
-                prevStocks.filter((stock) => stock.currentPrice > stock.price)
-              );
-            }}
-          >
-            Filter Gainers
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            onClick={() => {
-              setStocks((prevStocks) =>
-                prevStocks.filter((stock) => stock.currentPrice <= stock.price)
-              );
-            }}
-          >
-            Filter Losers
-          </Button>
+
+          <Tooltip title="Sort by Price">
+            <IconButton
+              size="small"
+              onClick={handleSortByPrice}
+              sx={{
+                color: "primary.main", // Default icon color
+                "&:hover": {
+                  color: "secondary.main", // Hover color
+                },
+              }}
+            >
+              <SortIcon />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Filter Increase">
+            <IconButton
+              size="small"
+              onClick={handleFilterIncrease}
+              sx={{
+                color: "error.main",
+                "&:hover": {
+                  color: "warning.main",
+                },
+              }}
+            >
+              <ArrowUpwardIcon />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Filter Decrease">
+            <IconButton
+              size="small"
+              onClick={handleFilterDecrease}
+              sx={{
+                color: "success.main",
+                "&:hover": {
+                  color: "warning.main",
+                },
+              }}
+            >
+              <ArrowDownwardIcon />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Reset Filters">
+            <IconButton
+              size="small"
+              color="secondary"
+              onClick={resetFilters}
+              sx={{
+                color: "secondary.main",
+                "&:hover": {
+                  color: "primary.main",
+                },
+              }}
+            >
+              <RefreshIcon />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Box>
       <Grid container spacing={3}>
@@ -279,13 +346,12 @@ const WatchlistComponent = () => {
                 <Skeleton variant="text" />
               </Grid>
             ))
-          : stocks.map((stock) => (
+          : filteredStocks.map((stock) => (
               <Grid item xs={12} sm={6} md={4} key={stock.id}>
                 <Card
                   sx={{
                     boxShadow: 3,
                     borderRadius: 2,
-                    background: "linear-gradient(135deg,rgb(255, 255, 255),rgb(227, 242, 255))",
                     overflow: "hidden",
                     height: "100%",
                     display: "flex",
@@ -294,44 +360,50 @@ const WatchlistComponent = () => {
                     "&:hover": { boxShadow: 6, transform: "translateY(-5px)" },
                   }}
                 >
+                  {/* Header Segment */}
+                  <Box
+                    sx={{
+                      background: "linear-gradient(135deg, #6A11CB, #2575FC)",
+                      color: "white",
+                      padding: "10px 16px",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      sx={{ fontWeight: "bold", fontSize: "1.1rem" }}
+                    >
+                      {stock.stock_name}
+                    </Typography>
+                    <Chip
+                      label={`Ticker: ${stock.ticker}`}
+                      sx={{
+                        backgroundColor: "rgba(255, 255, 255, 0.2)",
+                        color: "white",
+                        fontWeight: "bold",
+                      }}
+                    />
+                  </Box>
+
+                  {/* Content Segment */}
                   <CardContent
                     sx={{
                       flex: 1,
                       display: "flex",
                       flexDirection: "column",
                       justifyContent: "space-between",
+                      background:
+                        "linear-gradient(135deg, rgb(255, 255, 255), rgb(227, 242, 255))",
                     }}
                   >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: "bold", color: "#3f51b5" }}
-                      >
-                        {stock.stock_name}
-                      </Typography>
-                      <Chip
-                        label={`Ticker: ${stock.ticker}`}
-                        sx={{
-                          backgroundColor: "rgba(76, 101, 175, 0.1)",
-                          color: "#3f51b5",
-                          fontWeight: "bold",
-                        }}
-                      />
-                    </Box>
-                    <Divider sx={{ mt: 1 }} />
                     <Box
                       sx={{
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "flex-start",
                         alignItems: "flex-start",
-                        mt: 2,
                         gap: 1.5,
                       }}
                     >
@@ -378,13 +450,18 @@ const WatchlistComponent = () => {
                           fontWeight: "bold",
                           fontSize: "0.9rem",
                           padding: "5px 10px",
-                          marginTop: "10px",
                         }}
                       />
                     </Box>
                   </CardContent>
+
+                  {/* Actions Segment */}
                   <CardActions
-                    sx={{ justifyContent: "space-between", mt: "auto" }}
+                    sx={{
+                      justifyContent: "space-between",
+                      padding: "8px 16px",
+                      background:"linear-gradient(135deg, rgb(255, 255, 255), rgb(227, 242, 255))"
+                    }}
                   >
                     <Button
                       variant="contained"
@@ -398,13 +475,11 @@ const WatchlistComponent = () => {
                             stock.currentPrice <= stock.price
                               ? "rgb(76, 175, 80)"
                               : "rgb(244, 67, 54)",
-                          border: `1px solid
-                            ${
-                              stock.currentPrice <= stock.price
-                                ? "rgb(76, 175, 80)"
-                                : "rgb(244, 67, 54)"
-                            }`,
-                          cursor: "pointer",
+                          border: `1px solid ${
+                            stock.currentPrice <= stock.price
+                              ? "rgb(76, 175, 80)"
+                              : "rgb(244, 67, 54)"
+                          }`,
                         },
                         backgroundColor:
                           stock.currentPrice <= stock.price
@@ -412,7 +487,6 @@ const WatchlistComponent = () => {
                             : "rgb(244, 67, 54)",
                         color: "white",
                         fontWeight: "bold",
-                        minWidth: 100,
                         borderRadius: 2,
                       }}
                     >

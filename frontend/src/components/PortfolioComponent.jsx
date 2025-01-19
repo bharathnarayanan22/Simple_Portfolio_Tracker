@@ -26,7 +26,9 @@ import {
   Skeleton,
   Chip,
   Switch,
+  InputAdornment,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import { Pie, Bar, Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -38,6 +40,7 @@ import {
   BarElement,
   LineElement,
   PointElement,
+  Title,
 } from "chart.js";
 import axios from "axios";
 import PortfolioHeader from "./PortfolioButtons";
@@ -57,7 +60,8 @@ ChartJS.register(
   LinearScale,
   BarElement,
   LineElement,
-  PointElement
+  PointElement,
+  Title
 );
 import { format } from "date-fns";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -90,6 +94,7 @@ const PortfolioComponent = ({
   const [filter, setFilter] = useState("");
   const [selectedStock, setSelectedStock] = useState("");
   const [tableView, setTableView] = useState(true);
+  const [stockPriceHistory, setStockPriceHistory] = useState([]);
 
   const sectorMap = {
     Tech: ["AAPL", "MSFT", "GOOG"],
@@ -128,52 +133,43 @@ const PortfolioComponent = ({
   };
 
   useEffect(() => {
+    const userId = localStorage.getItem("userId");
+  
     const fetchPortfolio = async () => {
       setLoading(true);
-
-      const userId = localStorage.getItem("userId");
       try {
-        const portfolioResponse = await axios.get(
-          `http://localhost:8080/api/users/${userId}/portfolio`
-        );
+        const [portfolioResponse, allStocksResponse] = await Promise.all([
+          axios.get(`http://localhost:8080/api/users/${userId}/portfolio`),
+          axios.get("http://localhost:8080/stocks"),
+        ]);
+  
         const portfolioData = portfolioResponse.data;
-
-        const allStocksResponse = await axios.get(
-          "http://localhost:8080/stocks"
-        );
         const allStocks = allStocksResponse.data;
-
+  
         const matchedPortfolio = portfolioData.map((portfolioStock) => {
           const stockDetails = allStocks.find(
             (stock) => stock.ticker === portfolioStock.ticker
           );
-
-          if (stockDetails) {
-            return {
-              ...portfolioStock,
-              stockId: stockDetails.id,
-              currentPrice: stockDetails.price,
-              sector: stockDetails.sector || "Unknown",
-              dividendYield: Math.random() * 0.05,
-            };
-          } else {
-            return {
-              ...portfolioStock,
-              currentPrice: portfolioStock.purchasePrice,
-            };
-          }
+          return stockDetails
+            ? {
+                ...portfolioStock,
+                stockId: stockDetails.id,
+                currentPrice: stockDetails.price,
+                sector: stockDetails.sector || "Unknown",
+                dividendYield: Math.random() * 0.05,
+              }
+            : {
+                ...portfolioStock,
+                currentPrice: portfolioStock.purchasePrice,
+              };
         });
-
-        const newSectorData = calculateSectorData(matchedPortfolio);
-        setSectorData(newSectorData);
-
-        const portfolioTimeline = await fetchTimelineData(matchedPortfolio);
-        console.log(portfolioTimeline);
-
+  
+        const sectorData = calculateSectorData(matchedPortfolio);
+        setSectorData(sectorData);
+  
+        await fetchPortfolioHistory(matchedPortfolio);
         setPortfolio(matchedPortfolio);
-        setTimelineData(portfolioTimeline);
         calculateSummary(matchedPortfolio);
-        // calculateSectorData(matchedPortfolio);
         calculateDividendData(matchedPortfolio);
       } catch (error) {
         console.error("Error fetching portfolio or stocks:", error);
@@ -181,94 +177,77 @@ const PortfolioComponent = ({
         setLoading(false);
       }
     };
-
-    const sectorMap = {
-      Tech: [
-        "AAPL",
-        "MSFT",
-        "GOOGL",
-        "NVDA",
-        "TSLA",
-        "AMD",
-        "INTC",
-        "CSCO",
-        "ADBE",
-        "CRM",
-      ],
-      Healthcare: ["JNJ", "PFE", "MRK"],
-      Finance: ["BRK.A", "V", "MA", "JPM", "GS", "C"],
-      Energy: ["XOM", "CVX"],
-      Consumer: ["KO", "PEP", "PG", "WMT", "TGT", "HD"],
-    };
-
+  
     const calculateSectorData = (portfolio) => {
-      const sectorData = {};
-
-      portfolio.forEach((stock) => {
-        let sector = "Other";
-        for (const [key, tickers] of Object.entries(sectorMap)) {
-          if (tickers.includes(stock.ticker)) {
-            sector = key;
-            break;
-          }
-        }
-
-        const value = stock.currentPrice * stock.quantity;
-
-        if (sectorData[sector]) {
-          sectorData[sector] += value;
-        } else {
-          sectorData[sector] = value;
-        }
-      });
-
-      return sectorData;
+      const sectorMap = {
+        Tech: ["AAPL", "MSFT", "GOOGL", "NVDA", "TSLA", "AMD", "INTC", "CSCO", "ADBE", "CRM"],
+        Healthcare: ["JNJ", "PFE", "MRK"],
+        Finance: ["BRK.A", "V", "MA", "JPM", "GS", "C"],
+        Energy: ["XOM", "CVX"],
+        Consumer: ["KO", "PEP", "PG", "WMT", "TGT", "HD"],
+      };
+  
+      return portfolio.reduce((acc, stock) => {
+        const sector = Object.keys(sectorMap).find((key) =>
+          sectorMap[key].includes(stock.ticker)
+        ) || "Other";
+        acc[sector] = (acc[sector] || 0) + stock.currentPrice * stock.quantity;
+        return acc;
+      }, {});
     };
-
-    const fetchTimelineData = async (portfolio) => {
-      const timelineData = [];
-      console.log(portfolio);
-
-      for (const stock of portfolio) {
-        try {
-          const response = await axios.get(
-            `http://localhost:8080/api/stockPrices/history/${stock.stockId}`
-          );
-          const stockPriceHistory = response.data;
-          console.log(stockPriceHistory);
-
-          stockPriceHistory.forEach((priceData) => {
-            const date = priceData.timestamp;
-            const valueAtDate = stock.quantity * priceData.price;
-
-            const existingEntry = timelineData.find(
-              (entry) => entry.date === date
-            );
-
-            if (existingEntry) {
-              existingEntry.value += valueAtDate;
-            } else {
-              timelineData.push({
-                date,
-                value: valueAtDate,
-                ticker: stock.ticker,
-              });
-            }
-          });
-        } catch (error) {
-          console.error(
-            `Error fetching price history for stock ${stock.stockId}:`,
-            error
-          );
+  
+    const fetchPortfolioHistory = async (portfolio) => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8080/api/portfolio/history/${userId}`
+        );
+        const data = response.data;
+  
+        setTimelineData(
+          data.map((entry) => ({
+            timestamp: entry.timestamp,
+            date: format(new Date(entry.timestamp), "dd-MM-yyyy"),
+            value: entry.totalValue,
+          }))
+        );
+  
+        if (data.length) {
+          await fetchStockPricesFromTimestamp(portfolio, data[0].timestamp);
         }
+      } catch (error) {
+        console.error("Error fetching portfolio history:", error);
       }
-
-      timelineData.sort((a, b) => new Date(a.date) - new Date(b.date));
-      return timelineData;
     };
-
+  
+    const fetchStockPricesFromTimestamp = async (portfolio, timestamp) => {
+      try {
+        const stockPriceData = await Promise.all(
+          portfolio.map(async (stock) => {
+            const response = await axios.get(
+              `http://localhost:8080/api/stockPrices/history/${stock.stockId}`
+            );
+            const stockPrices = response.data.filter(
+              (priceData) =>
+                new Date(priceData.timestamp) >= new Date(timestamp)
+            );
+            return {
+              ticker: stock.ticker,
+              prices: stockPrices.map((priceData) => ({
+                timestamp: priceData.timestamp,
+                price: priceData.price,
+              })),
+            };
+          })
+        );
+        setStockPriceHistory(stockPriceData);
+      } catch (error) {
+        console.error("Error fetching stock price history:", error);
+      }
+    };
+  
     fetchPortfolio();
   }, []);
+  
 
   const calculateSummary = (data) => {
     const totalValue = data.reduce(
@@ -324,25 +303,34 @@ const PortfolioComponent = ({
     setSelectedStock(event.target.value);
   };
 
+
   const filteredTimelineData =
     selectedStock === ""
-      ? timelineData
-      : timelineData.filter((entry) => entry.ticker === selectedStock);
+      ? timelineData 
+      : stockPriceHistory.find((entry) => entry.ticker === selectedStock)
+          ?.prices || [];
 
+
+  // Chart Data
   const chartData = {
-    labels: filteredTimelineData.map((entry) =>
-      format(new Date(entry.date), "dd-MM-yyyy")
-    ),
+    labels: filteredTimelineData.map((entry) => {
+      const dateObj = new Date(entry.timestamp);
+      const formattedDate = dateObj.toLocaleDateString(); 
+      const formattedTime = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
+      return `${formattedDate}\n${formattedTime}`;
+    }),
     datasets: [
       {
         label: `Portfolio Value (${selectedStock || "All Stocks"})`,
-        data: filteredTimelineData.map((entry) => entry.value),
+        data: filteredTimelineData.map(
+          (entry) => (selectedStock === "" ? entry.value : entry.price)
+        ),
         borderColor: "#42A5F5",
         fill: false,
       },
     ],
   };
-
+  
   const handleExport = () => {
     if (!portfolio.length) {
       console.warn("No portfolio data to export.");
@@ -584,17 +572,23 @@ const PortfolioComponent = ({
 
                 {/* Search Bar */}
                 <TextField
+                  label="Search Stocks"
                   variant="outlined"
                   size="small"
-                  placeholder="Search stocks"
-                  sx={{
-                    width: 300,
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      border: "2px solid #ccc",
-                    },
-                  }}
-                  value={filter}
                   onChange={(e) => setFilter(e.target.value)}
+                  value={filter}
+                  sx={{
+                    bgcolor: "#ffffff",
+                    borderRadius: 1,
+                    width: "30%",
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
 
@@ -829,26 +823,31 @@ const PortfolioComponent = ({
                         sx={{
                           padding: "16px",
                           fontWeight: "bold",
-                          
                         }}
                       >
-                        <Typography variant="body2" sx={{fontWeight:"bold"}}>
-                            Purchase Price: ${stock.purchasePrice.toFixed(2)}
-                          </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                          Purchase Price: ${stock.purchasePrice.toFixed(2)}
+                        </Typography>
                         <Box
                           sx={{
                             display: "flex",
                             justifyContent: "space-between",
                           }}
                         >
-                          <Typography variant="body2" sx={{fontWeight:"bold", mt:1,
-                            color:stock.currentPrice >= stock.purchasePrice
-                            ? "green"
-                            : "red",
-                          }}>
-                          Current Price: ${stock.currentPrice.toFixed(2)}
-                        </Typography>
-                          
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontWeight: "bold",
+                              mt: 1,
+                              color:
+                                stock.currentPrice >= stock.purchasePrice
+                                  ? "green"
+                                  : "red",
+                            }}
+                          >
+                            Current Price: ${stock.currentPrice.toFixed(2)}
+                          </Typography>
+
                           <Chip
                             icon={
                               stock.currentPrice >= stock.purchasePrice ? (

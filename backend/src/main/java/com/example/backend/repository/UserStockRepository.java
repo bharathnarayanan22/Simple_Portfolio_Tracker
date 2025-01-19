@@ -13,6 +13,7 @@ public interface UserStockRepository extends JpaRepository<UserStock, Long> {
     List<UserStock> findByUserId(Long userId);
     Optional<UserStock> findByTicker(String ticker);
     Optional<UserStock> findByUserIdAndTicker(Long userId, String ticker);
+    List<Object[]> findStocksByUserId(Long userId);
 
     
 

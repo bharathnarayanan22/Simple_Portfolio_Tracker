@@ -17,6 +17,9 @@ public class StockPrice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String ticker; 
+
+
     @ManyToOne
     @JoinColumn(name = "stock_id", nullable = false)
     private Stock stock;
@@ -58,6 +61,14 @@ public class StockPrice {
 
     public void setTimestamp(Timestamp timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getTicker() {
+        return ticker;
+    }
+    
+    public void setTicker(String ticker) {
+        this.ticker = ticker;
     }
 }
 

@@ -222,4 +222,9 @@ public class UserServiceImpl implements UserService {
         return watchlistRepository.findStockIdsByUserId(userId);
     }
 
+    @Override
+    public List<Long> getAllUserIds() {
+        return userRepository.findAllUserIds();
+    }
+
 }
