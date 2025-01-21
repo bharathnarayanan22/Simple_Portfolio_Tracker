@@ -58,8 +58,8 @@ const TransactionsComponent = () => {
     const fetchData = async () => {
       try {
         const [fundsResponse, transactionsResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/api/users/${userId}/funds`),
-          axios.get(`http://localhost:8080/api/users/${userId}/transactions`),
+          axios.get(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/funds`),
+          axios.get(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/transactions`),
         ]);
 
         setFunds(fundsResponse.data);
@@ -140,7 +140,7 @@ const TransactionsComponent = () => {
     if (increaseAmount > 0) {
       try {
         await axios.post(
-          `http://localhost:8080/api/users/${userId}/addFunds?amount=${increaseAmount}`
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/addFunds?amount=${increaseAmount}`
         );
         setFunds(funds + increaseAmount);
         toast.success(`Funds increased by $${increaseAmount.toFixed(2)}`);

@@ -30,7 +30,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
-    const apiUrl = isSignUp ? 'http://localhost:8080/api/auth/signup' : 'http://localhost:8080/api/auth/login';
+    const apiUrl = isSignUp ? 'https://simple-portfolio-tracker-1-durb.onrender.com/api/auth/signup' : 'https://simple-portfolio-tracker-1-durb.onrender.com/api/auth/login';
     const requestData = { name, email, phoneNumber, password };
     console.log(requestData);
     setIsSubmitting(true); 

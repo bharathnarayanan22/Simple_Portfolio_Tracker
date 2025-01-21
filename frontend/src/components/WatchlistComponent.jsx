@@ -49,7 +49,7 @@ const WatchlistComponent = () => {
     const fetchWatchlist = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/users/${userId}/watchlist`
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/watchlist`
         );
         setStockIds(response.data);
       } catch (err) {
@@ -64,7 +64,7 @@ const WatchlistComponent = () => {
     const fetchStocks = async () => {
       try {
         const stockDetails = await Promise.all(
-          stockIds.map((id) => axios.get(`http://localhost:8080/stocks/${id}`))
+          stockIds.map((id) => axios.get(`https://simple-portfolio-tracker-1-durb.onrender.com/stocks/${id}`))
         );
         const enrichedStocks = stockDetails.map((response) => {
           const stock = response.data;
@@ -132,7 +132,7 @@ const WatchlistComponent = () => {
 
     try {
       setLoading(true);
-      await axios.post(`http://localhost:8080/api/users/${userId}/buyStock`, {
+      await axios.post(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/buyStock`, {
         stockName: selectedStock.stock_name,
         ticker: selectedStock.ticker,
         price: selectedStock.price,
@@ -155,7 +155,7 @@ const WatchlistComponent = () => {
   const handleRemoveFromWatchlist = async (stockId) => {
     try {
       await axios.delete(
-        `http://localhost:8080/api/users/${userId}/watchlist`,
+        `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/watchlist`,
         {
           data: { stockId },
         }

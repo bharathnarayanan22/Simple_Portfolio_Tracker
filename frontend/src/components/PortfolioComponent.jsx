@@ -139,8 +139,8 @@ const PortfolioComponent = ({
       setLoading(true);
       try {
         const [portfolioResponse, allStocksResponse] = await Promise.all([
-          axios.get(`http://localhost:8080/api/users/${userId}/portfolio`),
-          axios.get("http://localhost:8080/stocks"),
+          axios.get(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/portfolio`),
+          axios.get("https://simple-portfolio-tracker-1-durb.onrender.com/stocks"),
         ]);
   
         const portfolioData = portfolioResponse.data;
@@ -199,7 +199,7 @@ const PortfolioComponent = ({
     const fetchPortfolioHistory = async (portfolio) => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/portfolio/history/${userId}`
+          `https://simple-portfolio-tracker-1-durb.onrender.com/api/portfolio/history/${userId}`
         );
         const data = response.data;
   
@@ -224,7 +224,7 @@ const PortfolioComponent = ({
         const stockPriceData = await Promise.all(
           portfolio.map(async (stock) => {
             const response = await axios.get(
-              `http://localhost:8080/api/stockPrices/history/${stock.stockId}`
+              `https://simple-portfolio-tracker-1-durb.onrender.com/api/stockPrices/history/${stock.stockId}`
             );
             const stockPrices = response.data.filter(
               (priceData) =>
