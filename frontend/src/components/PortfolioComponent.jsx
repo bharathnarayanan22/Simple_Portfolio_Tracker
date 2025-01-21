@@ -317,7 +317,7 @@ const PortfolioComponent = ({
       const dateObj = new Date(entry.timestamp);
       const formattedDate = dateObj.toLocaleDateString(); 
       const formattedTime = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
-      return `${formattedDate}\n${formattedTime}`;
+      return `${formattedDate}`;
     }),
     datasets: [
       {

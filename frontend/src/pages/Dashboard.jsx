@@ -22,7 +22,7 @@ import PortfolioIcon from "@mui/icons-material/AccountBalance";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import TransactionIcon from "@mui/icons-material/AccountTree";
 import { BusinessCenter as StocksIcon} from '@mui/icons-material';
-
+import register_bg from "../assets/register_bg.jpg"
 import OverviewComponent from "../components/OverviewComponent";
 import StocksManagementComponent from "../components/StocksManagementComponent";
 import PortfolioComponent from "../components/PortfolioComponent";
@@ -150,7 +150,7 @@ export default function PortfolioTrackerDashboard() {
         sx={{
           display: "flex",
           minHeight: "100vh",
-          backgroundImage: "url('src/assets/register_bg.jpg')", 
+          backgroundImage: `url(${register_bg})`, 
           backgroundSize: "cover", 
           backgroundPosition: "center", 
           backgroundRepeat: "no-repeat", 
