@@ -18,7 +18,7 @@ public class StockPriceScheduler {
     @Autowired
     private PortfolioValueService portfolioValueService;
 
-    @Scheduled(fixedRate = 3600000) // Runs every hour
+    @Scheduled(fixedRate = 60000) // Runs every hour
     public void updateStockPricesAndPortfolioValues() {
         stockPriceService.generateStockPrices();
         updateAllPortfolios();

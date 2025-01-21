@@ -332,6 +332,7 @@ const WatchlistComponent = () => {
           </Tooltip>
         </Box>
       </Box>
+
       <Grid container spacing={3}>
         {loading
           ? Array.from(new Array(6)).map((_, index) => (
@@ -460,7 +461,8 @@ const WatchlistComponent = () => {
                     sx={{
                       justifyContent: "space-between",
                       padding: "8px 16px",
-                      background:"linear-gradient(135deg, rgb(255, 255, 255), rgb(227, 242, 255))"
+                      background:
+                        "linear-gradient(135deg, rgb(255, 255, 255), rgb(227, 242, 255))",
                     }}
                   >
                     <Button
@@ -516,10 +518,41 @@ const WatchlistComponent = () => {
           No stocks in your watchlist.
         </Typography>
       )}
-      <Dialog open={buyDialogOpen} onClose={() => setBuyDialogOpen(false)}>
-        <DialogTitle>Buy Stock</DialogTitle>
-        <DialogContent>
-          <Typography variant="subtitle1">
+      <Dialog
+        open={buyDialogOpen}
+        onClose={() => setBuyDialogOpen(false)}
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            boxShadow: 10,
+            background: "linear-gradient(135deg, #ffffff, #f0f0f0)",
+            padding: 3,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            fontSize: "1.5rem",
+            fontWeight: 700,
+            color: "#013d79",
+            textAlign: "center",
+            background: "linear-gradient(to right, #013d79, #0148a3)",
+            borderRadius: "8px 8px 0 0",
+            padding: 2,
+          }}
+        >
+          Buy Stock
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: "center", mt: 2 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: 600,
+              color: "#013d79",
+              mb: 2,
+              fontSize: "1.2rem",
+            }}
+          >
             {selectedStock?.stock_name} ({selectedStock?.ticker})
           </Typography>
           <TextField
@@ -529,17 +562,60 @@ const WatchlistComponent = () => {
             onChange={(e) => setQuantity(Number(e.target.value))}
             fullWidth
             margin="normal"
+            InputProps={{
+              sx: {
+                borderRadius: "8px",
+                "& input": { color: "#013d79" },
+              },
+            }}
+            InputLabelProps={{
+              sx: {
+                color: "#0148a3",
+              },
+            }}
           />
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setBuyDialogOpen(false)} color="error">
+        <DialogActions
+          sx={{
+            display: "flex",
+            justifyContent: "space-around",
+            mt: 2,
+            pb: 2,
+          }}
+        >
+          <Button
+            onClick={() => setBuyDialogOpen(false)}
+            sx={{
+              background: "linear-gradient(to right, #e74c3c, #c0392b)",
+              color: "#fff",
+              fontWeight: 700,
+              px: 3,
+              py: 1,
+              "&:hover": {
+                background: "linear-gradient(to right, #c0392b, #e74c3c)",
+              },
+            }}
+          >
             Cancel
           </Button>
-          <Button onClick={handleBuy} color="primary">
+          <Button
+            onClick={handleBuy}
+            sx={{
+              background: "linear-gradient(to right, #2ecc71, #27ae60)",
+              color: "#fff",
+              fontWeight: 700,
+              px: 3,
+              py: 1,
+              "&:hover": {
+                background: "linear-gradient(to right, #27ae60, #2ecc71)",
+              },
+            }}
+          >
             Buy
           </Button>
         </DialogActions>
       </Dialog>
+
       <ToastContainer />
     </Box>
   );

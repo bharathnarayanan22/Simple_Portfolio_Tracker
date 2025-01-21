@@ -22,8 +22,6 @@ import i4 from "../assets/i4.jpg";
 import i5 from "../assets/i5.jpg";
 import i6 from "../assets/i6.jpg";
 
-
-
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -41,7 +39,6 @@ const Home = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-
 
   return (
     <Box sx={{ overflowX: "hidden" }}>

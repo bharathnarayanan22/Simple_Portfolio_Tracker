@@ -950,10 +950,10 @@ const PortfolioComponent = ({
 
                     <Card
                       sx={{
-                        boxShadow: 6,
-                        backgroundColor: "#eeeeee",
+                        backgroundColor: "#fff",
                         padding: 3,
                         borderRadius: 2,
+                        boxShadow: 2,
                         mt: 2,
                       }}
                     >
@@ -1035,7 +1035,7 @@ const PortfolioComponent = ({
 
                     <Card
                       sx={{
-                        boxShadow: 6,
+                        boxShadow: 2,
                         backgroundColor: "#fff",
                         padding: 3,
                         borderRadius: 2,

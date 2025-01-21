@@ -19,6 +19,7 @@ import {
   IconButton,
   Modal,
   Skeleton,
+  InputAdornment,
 } from "@mui/material";
 import { Star, StarBorder } from "@mui/icons-material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -242,6 +243,7 @@ const StocksManagementComponent = ({
     }
   };
 
+  console.log(portfolio);
   const filteredStocks =
     isBuying || isBuying1
       ? stocks.filter(
@@ -250,10 +252,14 @@ const StocksManagementComponent = ({
             stock.price >= priceRange[0] &&
             stock.price <= priceRange[1]
         )
-      : portfolio.map((ownedStock) => ({
-          ...ownedStock,
-          price: generateRandomPrice(ownedStock.purchase_price),
-        }));
+      : portfolio
+          .filter((ownedStock) =>
+            ownedStock.stockName.toLowerCase().includes(search.toLowerCase())
+          )
+          .map((ownedStock) => ({
+            ...ownedStock,
+            price: generateRandomPrice(ownedStock.purchase_price),
+          }));
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -337,25 +343,94 @@ const StocksManagementComponent = ({
 
       {(view === "stocks" || view1 === "stocks") && (
         <>
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 4 }}>
-            <Typography
-              variant="h4"
+          <ToastContainer />
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <Card
               sx={{
-                fontWeight: "bold",
-                color: "primary.main",
-                mb: 2,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                borderRadius: 2,
+                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                mb: 3,
+                backgroundColor: "background.paper",
               }}
             >
-              Available Funds: ${funds.toFixed(2)}
-            </Typography>
-            <Box sx={{ display: "flex", gap: 2, mb: 4 }}>
+              {/* Left Section */}
+              <Box
+                sx={{
+                  p: 2,
+                  backgroundColor: "primary.main",
+                  color: "white",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "8px 0 0 8px",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Available Funds
+                </Typography>
+              </Box>
+
+              {/* Right Section */}
+              <Box
+                sx={{
+                  p: 2,
+                  backgroundColor: "white",
+                  color: "primary.main",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "0 8px 8px 0",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: "bold",
+                    textAlign: "center",
+                    textShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  ${funds.toFixed(2)}
+                </Typography>
+              </Box>
+            </Card>
+
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <TextField
                 label="Search Stocks"
                 variant="outlined"
                 size="small"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                fullWidth
+                fullWidth="true"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
               />
               {(isBuying || isBuying1) && (
                 <>
@@ -384,8 +459,6 @@ const StocksManagementComponent = ({
                 </>
               )}
             </Box>
-
-            <ToastContainer />
           </Box>
 
           {isBuying || isBuying1 ? (
@@ -417,65 +490,76 @@ const StocksManagementComponent = ({
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredStocks.map((stock) => (
-                    <TableRow
-                      key={stock.id}
-                      sx={{
-                        "&:nth-of-type(odd)": {
-                          backgroundColor: (theme) =>
-                            theme.palette.action.hover,
-                        },
-                        "&:hover": {
-                          backgroundColor: (theme) =>
-                            theme.palette.action.selected,
-                          cursor: "pointer",
-                        },
-                      }}
-                    >
-                      <TableCell>{stock.stock_name}</TableCell>
-                      <TableCell>{stock.ticker}</TableCell>
-                      <TableCell>${stock.price}</TableCell>
-                      <TableCell>{stock.volume}</TableCell>
-                      <TableCell>
-                        <TextField
-                          size="small"
-                          type="number"
-                          value={quantities[stock.id] || 1}
-                          onChange={(e) =>
-                            setQuantities({
-                              ...quantities,
-                              [stock.id]: Math.max(Number(e.target.value), 1),
-                            })
-                          }
-                          sx={{ width: 80 }}
-                          inputProps={{ min: 1 }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() => handleBuy(stock)}
-                          disabled={loading || funds < stock.price}
+                  {loading
+                    ? Array.from({ length: 5 }).map((_, index) => (
+                        <TableRow key={index}>
+                          <TableCell colSpan={8}>
+                            <Skeleton animation="wave" height={50} />
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    : filteredStocks.map((stock) => (
+                        <TableRow
+                          key={stock.id}
+                          sx={{
+                            "&:nth-of-type(odd)": {
+                              backgroundColor: (theme) =>
+                                theme.palette.action.hover,
+                            },
+                            "&:hover": {
+                              backgroundColor: (theme) =>
+                                theme.palette.action.selected,
+                              cursor: "pointer",
+                            },
+                          }}
                         >
-                          {loading ? <CircularProgress size={24} /> : "Buy"}
-                        </Button>
-                      </TableCell>
-                      <TableCell>
-                        <IconButton
-                          onClick={() => toggleWatchlist(stock)}
-                          color="inherit"
-                          aria-label="Add to Watchlist"
-                        >
-                          {watchlist.includes(stock.id) ? (
-                            <Star sx={{ color: "gold" }} />
-                          ) : (
-                            <StarBorder />
-                          )}
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                          <TableCell>{stock.stock_name}</TableCell>
+                          <TableCell>{stock.ticker}</TableCell>
+                          <TableCell>${stock.price}</TableCell>
+                          <TableCell>{stock.volume}</TableCell>
+                          <TableCell>
+                            <TextField
+                              size="small"
+                              type="number"
+                              value={quantities[stock.id] || 1}
+                              onChange={(e) =>
+                                setQuantities({
+                                  ...quantities,
+                                  [stock.id]: Math.max(
+                                    Number(e.target.value),
+                                    1
+                                  ),
+                                })
+                              }
+                              sx={{ width: 80 }}
+                              inputProps={{ min: 1 }}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              onClick={() => handleBuy(stock)}
+                              disabled={loading || funds < stock.price}
+                            >
+                              {loading ? <CircularProgress size={24} /> : "Buy"}
+                            </Button>
+                          </TableCell>
+                          <TableCell>
+                            <IconButton
+                              onClick={() => toggleWatchlist(stock)}
+                              color="inherit"
+                              aria-label="Add to Watchlist"
+                            >
+                              {watchlist.includes(stock.id) ? (
+                                <Star sx={{ color: "gold" }} />
+                              ) : (
+                                <StarBorder />
+                              )}
+                            </IconButton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -519,7 +603,7 @@ const StocksManagementComponent = ({
                         </TableCell>
                       </TableRow>
                     ))
-                  ) : (portfolio.length === 0 ? (
+                  ) : portfolio.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={8} align="center">
                         <Typography variant="h6" color="textSecondary">
@@ -528,7 +612,7 @@ const StocksManagementComponent = ({
                       </TableCell>
                     </TableRow>
                   ) : (
-                    portfolio.map((stock) => (
+                    filteredStocks.map((stock) => (
                       <TableRow
                         key={stock.id}
                         sx={{
@@ -577,8 +661,7 @@ const StocksManagementComponent = ({
                         </TableCell>
                       </TableRow>
                     ))
-                  ))
-                  }
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>
