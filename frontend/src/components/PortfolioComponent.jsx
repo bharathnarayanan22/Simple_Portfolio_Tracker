@@ -70,6 +70,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import gif from "../assets/gif.gif";
 
 const PortfolioComponent = ({
   onBuyClick,
@@ -459,1006 +460,1069 @@ const PortfolioComponent = ({
         </>
       ) : (
         <>
-          <Grid2
-            container
-            spacing={3}
-            sx={{ mb: 4 }}
-            justifyContent="space-between"
-          >
-            {[
-              {
-                title: "Total Portfolio Value",
-                value: `$${summary.totalValue.toFixed(2)}`,
-                color: "primary",
-                icon: <MonetizationOn sx={{ mr: 1 }} />,
-              },
-              {
-                title: "Total Investment",
-                value: `$${summary.totalInvestment.toFixed(2)}`,
-                color: "secondary",
-                icon: <AttachMoney sx={{ mr: 1 }} />,
-              },
-              {
-                title: "Profit/Loss",
-                value: `$${summary.profitLoss.toFixed(
-                  2
-                )} (${summary.growthPercentage.toFixed(2)}%)`,
-                color: summary.profitLoss >= 0 ? "success" : "error",
-                icon: <TrendingUp sx={{ mr: 1 }} />,
-              },
-              {
-                title: "Total Dividends",
-                value: `$${summary.totalDividends.toFixed(2)}`,
-                color: "info",
-                icon: <AccessTime sx={{ mr: 1 }} />,
-              },
-            ].map((item, index) => (
-              <Grid2 item xs={12} sm={6} md={3} key={index}>
-                <Card
-                  sx={{
-                    transition: "transform 0.3s, box-shadow 0.3s",
-                    "&:hover": { transform: "scale(1.05)", boxShadow: 6 },
-                    backgroundColor: "#ffffff",
-                    boxShadow: 3,
-                    borderRadius: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                    height: "100%",
-                  }}
-                >
-                  <CardContent
-                    sx={{
-                      backgroundColor: (theme) =>
-                        theme.palette[item.color].main,
-                      color: "#ffffff",
-                      textAlign: "center",
-                      padding: "10px",
-                    }}
-                  >
-                    <Box
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
+          {filteredPortfolio.length === 0 ? (
+            <Box textAlign="center" mt={4}>
+              <img
+                src={gif} 
+                alt="No stocks"
+                style={{ maxWidth: "40%", margin: "0 auto" }}
+              />
+              <Typography
+                variant="h6"
+                sx={{
+                  mt: 2,
+                  fontWeight: "bold",
+                  fontFamily: "'Poppins', sans-serif",
+                  color: "#555",
+                }}
+              >
+                Buy stocks to see your portfolio!
+              </Typography>
+            </Box>
+          ) : (
+            <>
+              <Grid2
+                container
+                spacing={3}
+                sx={{ mb: 4 }}
+                justifyContent="space-between"
+              >
+                {[
+                  {
+                    title: "Total Portfolio Value",
+                    value: `$${summary.totalValue.toFixed(2)}`,
+                    color: "primary",
+                    icon: <MonetizationOn sx={{ mr: 1 }} />,
+                  },
+                  {
+                    title: "Total Investment",
+                    value: `$${summary.totalInvestment.toFixed(2)}`,
+                    color: "secondary",
+                    icon: <AttachMoney sx={{ mr: 1 }} />,
+                  },
+                  {
+                    title: "Profit/Loss",
+                    value: `$${summary.profitLoss.toFixed(
+                      2
+                    )} (${summary.growthPercentage.toFixed(2)}%)`,
+                    color: summary.profitLoss >= 0 ? "success" : "error",
+                    icon: <TrendingUp sx={{ mr: 1 }} />,
+                  },
+                  {
+                    title: "Total Dividends",
+                    value: `$${summary.totalDividends.toFixed(2)}`,
+                    color: "info",
+                    icon: <AccessTime sx={{ mr: 1 }} />,
+                  },
+                ].map((item, index) => (
+                  <Grid2 item xs={12} sm={6} md={3} key={index}>
+                    <Card
+                      sx={{
+                        transition: "transform 0.3s, box-shadow 0.3s",
+                        "&:hover": { transform: "scale(1.05)", boxShadow: 6 },
+                        backgroundColor: "#ffffff",
+                        boxShadow: 3,
+                        borderRadius: 2,
+                        display: "flex",
+                        flexDirection: "column",
+                        height: "100%",
+                      }}
                     >
-                      {item.icon}
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+                      <CardContent
+                        sx={{
+                          backgroundColor: (theme) =>
+                            theme.palette[item.color].main,
+                          color: "#ffffff",
+                          textAlign: "center",
+                          padding: "10px",
+                        }}
                       >
-                        {item.title}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                  <CardContent
+                        <Box
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          {item.icon}
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              fontWeight: "bold",
+                              textTransform: "uppercase",
+                            }}
+                          >
+                            {item.title}
+                          </Typography>
+                        </Box>
+                      </CardContent>
+                      <CardContent
+                        sx={{
+                          textAlign: "center",
+                          backgroundColor: "#ffffff",
+                          flex: 1,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Typography
+                          variant="h4"
+                          sx={{ fontWeight: "bold", color: "#333" }}
+                        >
+                          {item.value}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid2>
+                ))}
+              </Grid2>
+
+              <Divider sx={{ mb: 4 }} />
+
+              <Grid item xs={12} sx={{ mb: 4 }}>
+                {/* Title with icon and filter */}
+                <Grid
+                  container
+                  justifyContent="space-between"
+                  alignItems="center"
+                  sx={{ mb: 2 }}
+                >
+                  {/* Title with Icon */}
+                  <Grid
+                    item
+                    xs={12}
                     sx={{
-                      textAlign: "center",
-                      backgroundColor: "#ffffff",
-                      flex: 1,
                       display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
+                      justifyContent: "space-between",
+                      mb: 1,
                     }}
                   >
                     <Typography
-                      variant="h4"
-                      sx={{ fontWeight: "bold", color: "#333" }}
+                      variant="h5"
+                      gutterBottom
+                      sx={{
+                        fontWeight: "bold",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        color: (theme) => theme.palette.primary.main,
+                        textTransform: "uppercase",
+                        "&:hover": {
+                          textShadow: "0px 2px 4px rgba(0, 0, 0, 0.3)",
+                          cursor: "pointer",
+                        },
+                      }}
                     >
-                      {item.value}
+                      <TableChartIcon sx={{ fontSize: 28 }} /> My Stocks
                     </Typography>
-                  </CardContent>
-                </Card>
-              </Grid2>
-            ))}
-          </Grid2>
 
-          <Divider sx={{ mb: 4 }} />
+                    {/* Search Bar */}
+                    <TextField
+                      label="Search Stocks"
+                      variant="outlined"
+                      size="small"
+                      onChange={(e) => setFilter(e.target.value)}
+                      value={filter}
+                      sx={{
+                        bgcolor: "#ffffff",
+                        borderRadius: 1,
+                        width: "30%",
+                      }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
 
-          <Grid item xs={12} sx={{ mb: 4 }}>
-            {/* Title with icon and filter */}
-            <Grid
-              container
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{ mb: 2 }}
-            >
-              {/* Title with Icon */}
-              <Grid
-                item
-                xs={12}
-                sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}
-              >
-                <Typography
-                  variant="h5"
-                  gutterBottom
-                  sx={{
-                    fontWeight: "bold",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    color: (theme) => theme.palette.primary.main,
-                    textTransform: "uppercase",
-                    "&:hover": {
-                      textShadow: "0px 2px 4px rgba(0, 0, 0, 0.3)",
-                      cursor: "pointer",
-                    },
-                  }}
-                >
-                  <TableChartIcon sx={{ fontSize: 28 }} /> My Stocks
-                </Typography>
+                  {/* View Switch */}
+                  <Grid
+                    item
+                    xs={12}
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                      Table View
+                    </Typography>
+                    <Switch
+                      size="small"
+                      checked={!tableView}
+                      onChange={(e) => handleToggleView(e.target.checked)}
+                      color="primary"
+                    />
+                    <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+                      Sliding View
+                    </Typography>
+                  </Grid>
+                </Grid>
 
-                {/* Search Bar */}
-                <TextField
-                  label="Search Stocks"
-                  variant="outlined"
-                  size="small"
-                  onChange={(e) => setFilter(e.target.value)}
-                  value={filter}
-                  sx={{
-                    bgcolor: "#ffffff",
-                    borderRadius: 1,
-                    width: "30%",
-                  }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-
-              {/* View Switch */}
-              <Grid
-                item
-                xs={12}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                }}
-              >
-                <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                  Table View
-                </Typography>
-                <Switch
-                  size="small"
-                  checked={!tableView}
-                  onChange={(e) => handleToggleView(e.target.checked)}
-                  color="primary"
-                />
-                <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                  Sliding View
-                </Typography>
-              </Grid>
-            </Grid>
-
-            {/* Conditional View */}
-            {tableView ? (
-              <>
-                <TableContainer
-                  component={Paper}
-                  sx={{
-                    borderRadius: 2,
-                    boxShadow: 3,
-                    "&:hover": { boxShadow: 6 },
-                  }}
-                >
-                  <Table>
-                    <TableHead>
-                      <TableRow
+                {/* Conditional View */}
+                {tableView ? (
+                  <>
+                    <TableContainer
+                      component={Paper}
+                      sx={{
+                        borderRadius: 2,
+                        boxShadow: 3,
+                        "&:hover": { boxShadow: 6 },
+                      }}
+                    >
+                      <Table>
+                        <TableHead>
+                          <TableRow
+                            sx={{
+                              backgroundColor: (theme) =>
+                                theme.palette.primary.dark,
+                            }}
+                          >
+                            <TableCell
+                              sx={{ color: "#fff", fontWeight: "bold" }}
+                            >
+                              Stock Name
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "#fff", fontWeight: "bold" }}
+                            >
+                              Symbol
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "#fff", fontWeight: "bold" }}
+                            >
+                              Quantity
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "#fff", fontWeight: "bold" }}
+                            >
+                              Purchase Price
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "#fff", fontWeight: "bold" }}
+                            >
+                              Current Price
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "#fff", fontWeight: "bold" }}
+                            >
+                              Total Value
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "#fff", fontWeight: "bold" }}
+                            >
+                              Profit/Loss
+                            </TableCell>
+                            <TableCell
+                              sx={{ color: "#fff", fontWeight: "bold" }}
+                            >
+                              Dividends
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {filteredPortfolio.length === 0 ? (
+                            <TableRow>
+                              <TableCell
+                                colSpan={8}
+                                align="center"
+                                sx={{ fontStyle: "italic" }}
+                              >
+                                No stocks to display.
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            filteredPortfolio
+                              .slice(
+                                page * rowsPerPage,
+                                page * rowsPerPage + rowsPerPage
+                              )
+                              .map((stock, index) => (
+                                <TableRow
+                                  key={index}
+                                  sx={{
+                                    "&:nth-of-type(odd)": {
+                                      backgroundColor: (theme) =>
+                                        theme.palette.action.hover,
+                                    },
+                                    "&:hover": {
+                                      backgroundColor: (theme) =>
+                                        theme.palette.action.selected,
+                                      cursor: "pointer",
+                                    },
+                                  }}
+                                >
+                                  <TableCell>{stock.stockName}</TableCell>
+                                  <TableCell>{stock.ticker}</TableCell>
+                                  <TableCell>{stock.quantity}</TableCell>
+                                  <TableCell>
+                                    ${stock.purchasePrice.toFixed(2)}
+                                  </TableCell>
+                                  <TableCell>
+                                    ${stock.currentPrice.toFixed(2)}
+                                  </TableCell>
+                                  <TableCell>
+                                    $
+                                    {(
+                                      stock.currentPrice * stock.quantity
+                                    ).toFixed(2)}
+                                  </TableCell>
+                                  <TableCell
+                                    style={{
+                                      color:
+                                        stock.currentPrice >=
+                                        stock.purchasePrice
+                                          ? "green"
+                                          : "red",
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    $
+                                    {(
+                                      (stock.currentPrice -
+                                        stock.purchasePrice) *
+                                      stock.quantity
+                                    ).toFixed(2)}
+                                  </TableCell>
+                                  <TableCell>
+                                    $
+                                    {(
+                                      stock.quantity *
+                                      stock.currentPrice *
+                                      stock.dividendYield
+                                    ).toFixed(2)}
+                                  </TableCell>
+                                </TableRow>
+                              ))
+                          )}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                    {/* Pagination */}
+                    <TablePagination
+                      rowsPerPageOptions={[5]}
+                      component="div"
+                      count={filteredPortfolio.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      onPageChange={handleChangePage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                  </>
+                ) : (
+                  <Slider {...sliderSettings}>
+                    {filteredPortfolio.map((stock, index) => (
+                      <Box
+                        key={index}
                         sx={{
-                          backgroundColor: (theme) =>
-                            theme.palette.primary.dark,
+                          display: "inline-block", // Ensures items stay inline
+                          marginRight: "16px", // Space between cards
                         }}
                       >
-                        <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-                          Stock Name
-                        </TableCell>
-                        <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-                          Symbol
-                        </TableCell>
-                        <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-                          Quantity
-                        </TableCell>
-                        <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-                          Purchase Price
-                        </TableCell>
-                        <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-                          Current Price
-                        </TableCell>
-                        <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-                          Total Value
-                        </TableCell>
-                        <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-                          Profit/Loss
-                        </TableCell>
-                        <TableCell sx={{ color: "#fff", fontWeight: "bold" }}>
-                          Dividends
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {filteredPortfolio.length === 0 ? (
-                        <TableRow>
-                          <TableCell
-                            colSpan={8}
-                            align="center"
-                            sx={{ fontStyle: "italic" }}
+                        <Card
+                          sx={{
+                            borderRadius: 2,
+                            padding: 2,
+                            borderRight: "2px solid black",
+                            background:
+                              "linear-gradient(135deg, #ffffff, #f0f8ff)",
+                            boxShadow: 3,
+                            "&:hover": {
+                              boxShadow: 6,
+                              transform: "scale(1.05)",
+                            },
+                            transition: "transform 0.3s ease",
+                            minWidth: 250,
+                          }}
+                        >
+                          {/* Header Section */}
+                          <Box
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              alignItems: "center",
+                              padding: "8px",
+                              backgroundColor: (() => {
+                                const colors = [
+                                  "#FFC107", // Amber
+                                  "#FF9800", // Orange
+                                  "#8BC34A", // Light Green
+                                  "#2196F3", // Blue
+                                  "#9C27B0", // Purple
+                                  "#FF69B4", // Pink
+                                  "#03A9F4", // Cyan
+                                  "#FFA07A", // Coral
+                                  "#4CAF50", // Green
+                                ];
+
+                                return colors[
+                                  Math.floor(Math.random() * colors.length)
+                                ];
+                              })(),
+                              borderRadius: "8px 8px 8px 8px",
+                            }}
                           >
-                            No stocks to display.
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        filteredPortfolio
-                          .slice(
-                            page * rowsPerPage,
-                            page * rowsPerPage + rowsPerPage
-                          )
-                          .map((stock, index) => (
-                            <TableRow
-                              key={index}
+                            <Typography
+                              variant="h6"
+                              fontWeight="bold"
+                              color="white"
+                            >
+                              {stock.stockName}
+                            </Typography>
+                            <Chip
+                              label={stock.ticker}
+                              color="white"
+                              variant="outlined"
                               sx={{
-                                "&:nth-of-type(odd)": {
-                                  backgroundColor: (theme) =>
-                                    theme.palette.action.hover,
-                                },
-                                "&:hover": {
-                                  backgroundColor: (theme) =>
-                                    theme.palette.action.selected,
-                                  cursor: "pointer",
-                                },
+                                fontSize: 14,
+                                fontWeight: "bold",
+                                color: "white",
+                                border: "2px solid",
+                              }}
+                            />
+                          </Box>
+
+                          {/* Content Section */}
+                          <Box
+                            sx={{
+                              padding: "16px",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            <Typography
+                              variant="body2"
+                              sx={{ fontWeight: "bold" }}
+                            >
+                              Purchase Price: ${stock.purchasePrice.toFixed(2)}
+                            </Typography>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
                               }}
                             >
-                              <TableCell>{stock.stockName}</TableCell>
-                              <TableCell>{stock.ticker}</TableCell>
-                              <TableCell>{stock.quantity}</TableCell>
-                              <TableCell>
-                                ${stock.purchasePrice.toFixed(2)}
-                              </TableCell>
-                              <TableCell>
-                                ${stock.currentPrice.toFixed(2)}
-                              </TableCell>
-                              <TableCell>
-                                $
-                                {(stock.currentPrice * stock.quantity).toFixed(
-                                  2
-                                )}
-                              </TableCell>
-                              <TableCell
-                                style={{
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontWeight: "bold",
+                                  mt: 1,
                                   color:
                                     stock.currentPrice >= stock.purchasePrice
                                       ? "green"
                                       : "red",
-                                  fontWeight: "bold",
                                 }}
                               >
-                                $
-                                {(
+                                Current Price: ${stock.currentPrice.toFixed(2)}
+                              </Typography>
+
+                              <Chip
+                                icon={
+                                  stock.currentPrice >= stock.purchasePrice ? (
+                                    <TrendingUpIcon sx={{ color: "green" }} />
+                                  ) : (
+                                    <TrendingDownIcon sx={{ color: "red" }} />
+                                  )
+                                }
+                                label={`$${(
                                   (stock.currentPrice - stock.purchasePrice) *
                                   stock.quantity
-                                ).toFixed(2)}
-                              </TableCell>
-                              <TableCell>
-                                $
-                                {(
-                                  stock.quantity *
-                                  stock.currentPrice *
-                                  stock.dividendYield
-                                ).toFixed(2)}
-                              </TableCell>
-                            </TableRow>
-                          ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                {/* Pagination */}
-                <TablePagination
-                  rowsPerPageOptions={[5]}
-                  component="div"
-                  count={filteredPortfolio.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-              </>
-            ) : (
-              <Slider {...sliderSettings}>
-                {filteredPortfolio.map((stock, index) => (
-                  <Box
-                    key={index}
+                                ).toFixed(2)}`}
+                                sx={{
+                                  fontSize: 14,
+                                  fontWeight: "bold",
+                                  backgroundColor:
+                                    stock.currentPrice >= stock.purchasePrice
+                                      ? "#e8f5e9"
+                                      : "#ffebee",
+                                  color:
+                                    stock.currentPrice >= stock.purchasePrice
+                                      ? "green"
+                                      : "red",
+                                  padding: "8px 12px",
+                                  "& .MuiChip-icon": {
+                                    marginLeft: 0,
+                                  },
+                                }}
+                              />
+                            </Box>
+                          </Box>
+                        </Card>
+                      </Box>
+                    ))}
+                  </Slider>
+                )}
+              </Grid>
+
+              <Divider sx={{ mb: 4 }} />
+
+              {/* Charts */}
+              {filteredPortfolio.length === 0 ? (
+                <Typography
+                  variant="h6"
+                  sx={{ textAlign: "center", color: "#888", margin: "20px 0" }}
+                >
+                  {" "}
+                  No data available in your portfolio.
+                </Typography>
+              ) : (
+                <Grid2 container spacing={3}>
+                  <Typography
+                    variant="h5"
+                    gutterBottom
                     sx={{
-                      display: "inline-block", // Ensures items stay inline
-                      marginRight: "16px", // Space between cards
+                      fontWeight: "bold",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      color: (theme) => theme.palette.primary.main,
+                      textTransform: "uppercase",
+                      "&:hover": {
+                        textShadow: "0px 2px 4px rgba(0, 0, 0, 0.3)",
+                        cursor: "pointer",
+                      },
                     }}
                   >
-                    <Card
+                    <TrendingUpIcon sx={{ marginRight: 1 }} /> Performance
+                    Trends
+                  </Typography>
+                  {/* Sector Allocation and Dividend Contribution */}
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="stretch"
+                    sx={{ width: "100%" }}
+                  >
+                    {/* Sector Allocation */}
+                    <Box
+                      flex={1}
                       sx={{
-                        borderRadius: 2,
-                        padding: 2,
-                        borderRight: "2px solid black",
-                        background: "linear-gradient(135deg, #ffffff, #f0f8ff)",
-                        boxShadow: 3,
-                        "&:hover": { boxShadow: 6, transform: "scale(1.05)" },
-                        transition: "transform 0.3s ease",
-                        minWidth: 250,
+                        maxWidth: "48%",
+                        boxShadow: 6,
+                        borderRadius: 3,
+                        backgroundColor: "#1a237e",
                       }}
                     >
-                      {/* Header Section */}
+                      <Card sx={{ height: "100%" }}>
+                        <CardContent>
+                          <Typography
+                            variant="h6"
+                            gutterBottom
+                            sx={{
+                              fontWeight: "bold",
+                              color: "#fff",
+                              padding: "12px 24px",
+                              borderRadius: 2,
+                              background:
+                                "linear-gradient(45deg, #3f51b5, #303f9f)",
+                              textAlign: "center",
+                              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+                              "&:hover": {
+                                background:
+                                  "linear-gradient(45deg, #303f9f, #3f51b5)",
+                                cursor: "pointer",
+                              },
+                            }}
+                          >
+                            Sector Allocation
+                          </Typography>
+
+                          <Card
+                            sx={{
+                              backgroundColor: "#fff",
+                              padding: 3,
+                              borderRadius: 2,
+                              boxShadow: 2,
+                              mt: 2,
+                            }}
+                          >
+                            <Pie
+                              data={{
+                                labels: Object.keys(sectorData),
+                                datasets: [
+                                  {
+                                    data: Object.values(sectorData),
+                                    backgroundColor: [
+                                      "#FF6384",
+                                      "#36A2EB",
+                                      "#FFCE56",
+                                      "#4BC0C0",
+                                      "#FF9F40",
+                                    ],
+                                    borderWidth: 2,
+                                  },
+                                ],
+                              }}
+                              options={{
+                                responsive: true,
+                                plugins: {
+                                  legend: {
+                                    position: "top",
+                                    labels: {
+                                      font: { size: 14, weight: "bold" },
+                                      color: "#333",
+                                    },
+                                  },
+                                  tooltip: {
+                                    callbacks: {
+                                      label: (tooltipItem) =>
+                                        `${
+                                          tooltipItem.label
+                                        }: $${tooltipItem.raw.toFixed(2)}`,
+                                    },
+                                  },
+                                },
+                              }}
+                            />
+                          </Card>
+                        </CardContent>
+                      </Card>
+                    </Box>
+
+                    {/* Dividend Contribution */}
+                    <Box
+                      flex={1}
+                      sx={{
+                        maxWidth: "48%",
+                        boxShadow: 6,
+                        borderRadius: 3,
+                        backgroundColor: "#e8f5e9",
+                      }}
+                    >
+                      <Card sx={{ height: "100%" }}>
+                        <CardContent>
+                          <Typography
+                            variant="h6"
+                            gutterBottom
+                            sx={{
+                              fontWeight: "bold",
+                              color: "#fff",
+                              background:
+                                "linear-gradient(45deg, #66bb6a, #43a047)",
+                              padding: "12px 24px",
+                              borderRadius: 2,
+                              textAlign: "center",
+                              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                              "&:hover": {
+                                background:
+                                  "linear-gradient(45deg, #43a047, #66bb6a)",
+                                cursor: "pointer",
+                              },
+                            }}
+                          >
+                            Dividend Contribution
+                          </Typography>
+
+                          <Card
+                            sx={{
+                              boxShadow: 2,
+                              backgroundColor: "#fff",
+                              padding: 3,
+                              borderRadius: 2,
+                              mt: 2,
+                            }}
+                          >
+                            <Pie
+                              data={{
+                                labels: Object.keys(dividendData),
+                                datasets: [
+                                  {
+                                    data: Object.values(dividendData),
+                                    backgroundColor: [
+                                      "#FF6384",
+                                      "#36A2EB",
+                                      "#FFCE56",
+                                      "#4BC0C0",
+                                      "#FF9F40",
+                                    ],
+                                    borderWidth: 1,
+                                  },
+                                ],
+                              }}
+                              options={{
+                                responsive: true,
+                                plugins: {
+                                  legend: { position: "top" },
+                                  tooltip: {
+                                    callbacks: {
+                                      label: (tooltipItem) =>
+                                        `${
+                                          tooltipItem.label
+                                        }: $${tooltipItem.raw.toFixed(2)}`,
+                                    },
+                                  },
+                                },
+                              }}
+                            />
+                          </Card>
+                        </CardContent>
+                      </Card>
+                    </Box>
+                  </Box>
+
+                  {/* Portfolio Value Over Time */}
+                  <Grid2 item xs={12} sx={{ width: "100%" }}>
+                    <Card
+                      sx={{
+                        boxShadow: 6,
+                        borderRadius: 3,
+                        backgroundColor: "#f5f5f5",
+                        padding: 3,
+                      }}
+                    >
+                      {/* Header with Title and Filter */}
                       <Box
                         sx={{
                           display: "flex",
                           justifyContent: "space-between",
                           alignItems: "center",
-                          padding: "8px",
-                          backgroundColor: (() => {
-                            const colors = [
-                              "#FFC107", // Amber
-                              "#FF9800", // Orange
-                              "#8BC34A", // Light Green
-                              "#2196F3", // Blue
-                              "#9C27B0", // Purple
-                              "#FF69B4", // Pink
-                              "#03A9F4", // Cyan
-                              "#FFA07A", // Coral
-                              "#4CAF50", // Green
-                            ];
-
-                            return colors[
-                              Math.floor(Math.random() * colors.length)
-                            ];
-                          })(),
-                          borderRadius: "8px 8px 8px 8px",
+                          marginBottom: 3,
+                          padding: "12px 24px",
+                          background:
+                            "linear-gradient(45deg, #1e88e5, #42a5f5)",
+                          borderRadius: 2,
+                          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
                         }}
                       >
+                        {/* Title */}
                         <Typography
                           variant="h6"
-                          fontWeight="bold"
-                          color="white"
-                        >
-                          {stock.stockName}
-                        </Typography>
-                        <Chip
-                          label={stock.ticker}
-                          color="white"
-                          variant="outlined"
                           sx={{
-                            fontSize: 14,
                             fontWeight: "bold",
-                            color: "white",
-                            border: "2px solid",
-                          }}
-                        />
-                      </Box>
-
-                      {/* Content Section */}
-                      <Box
-                        sx={{
-                          padding: "16px",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                          Purchase Price: ${stock.purchasePrice.toFixed(2)}
-                        </Typography>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
+                            color: "#fff",
                           }}
                         >
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              fontWeight: "bold",
-                              mt: 1,
-                              color:
-                                stock.currentPrice >= stock.purchasePrice
-                                  ? "green"
-                                  : "red",
-                            }}
-                          >
-                            Current Price: ${stock.currentPrice.toFixed(2)}
-                          </Typography>
+                          Portfolio Value Over Time
+                        </Typography>
 
-                          <Chip
-                            icon={
-                              stock.currentPrice >= stock.purchasePrice ? (
-                                <TrendingUpIcon sx={{ color: "green" }} />
-                              ) : (
-                                <TrendingDownIcon sx={{ color: "red" }} />
-                              )
-                            }
-                            label={`$${(
-                              (stock.currentPrice - stock.purchasePrice) *
-                              stock.quantity
-                            ).toFixed(2)}`}
+                        {/* Filter */}
+                        <FormControl
+                          sx={{
+                            minWidth: 200,
+                            backgroundColor: "#fff",
+                            borderRadius: 2,
+                            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                            "& .MuiOutlinedInput-root": {
+                              "& fieldset": {
+                                borderColor: "transparent",
+                              },
+                              "&:hover fieldset": {
+                                borderColor: "#1e88e5",
+                              },
+                              "&.Mui-focused fieldset": {
+                                borderColor: "#1e88e5",
+                              },
+                            },
+                          }}
+                        >
+                          <InputLabel
+                            id="stock-select-label"
+                            sx={{ color: "#000" }}
+                          >
+                            Select Stock
+                          </InputLabel>
+                          <Select
+                            labelId="stock-select-label"
+                            id="stock-select"
+                            value={selectedStock}
+                            onChange={handleStockSelection}
+                            label="Select Stock"
                             sx={{
-                              fontSize: 14,
+                              color: "#1e88e5",
                               fontWeight: "bold",
-                              backgroundColor:
-                                stock.currentPrice >= stock.purchasePrice
-                                  ? "#e8f5e9"
-                                  : "#ffebee",
-                              color:
-                                stock.currentPrice >= stock.purchasePrice
-                                  ? "green"
-                                  : "red",
-                              padding: "8px 12px",
-                              "& .MuiChip-icon": {
-                                marginLeft: 0,
+                              "& .MuiSelect-icon": {
+                                color: "#1e88e5",
                               },
                             }}
-                          />
-                        </Box>
+                          >
+                            <MenuItem value="" sx={{ color: "#1e88e5" }}>
+                              All Stocks
+                            </MenuItem>
+                            {portfolio.map((stock) => (
+                              <MenuItem key={stock.ticker} value={stock.ticker}>
+                                {stock.ticker}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
                       </Box>
-                    </Card>
-                  </Box>
-                ))}
-              </Slider>
-            )}
-          </Grid>
 
-          <Divider sx={{ mb: 4 }} />
-
-          {/* Charts */}
-          {filteredPortfolio.length === 0 ? (
-            <Typography
-              variant="h6"
-              sx={{ textAlign: "center", color: "#888", margin: "20px 0" }}
-            >
-              {" "}
-              No data available in your portfolio.
-            </Typography>
-          ) : (
-            <Grid2 container spacing={3}>
-              <Typography
-                variant="h5"
-                gutterBottom
-                sx={{
-                  fontWeight: "bold",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  color: (theme) => theme.palette.primary.main,
-                  textTransform: "uppercase",
-                  "&:hover": {
-                    textShadow: "0px 2px 4px rgba(0, 0, 0, 0.3)",
-                    cursor: "pointer",
-                  },
-                }}
-              >
-                <TrendingUpIcon sx={{ marginRight: 1 }} /> Performance Trends
-              </Typography>
-              {/* Sector Allocation and Dividend Contribution */}
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="stretch"
-                sx={{ width: "100%" }}
-              >
-                {/* Sector Allocation */}
-                <Box
-                  flex={1}
-                  sx={{
-                    maxWidth: "48%",
-                    boxShadow: 6,
-                    borderRadius: 3,
-                    backgroundColor: "#1a237e",
-                  }}
-                >
-                  <Card sx={{ height: "100%" }}>
-                    <CardContent>
-                      <Typography
-                        variant="h6"
-                        gutterBottom
-                        sx={{
-                          fontWeight: "bold",
-                          color: "#fff",
-                          padding: "12px 24px",
-                          borderRadius: 2,
-                          background:
-                            "linear-gradient(45deg, #3f51b5, #303f9f)",
-                          textAlign: "center",
-                          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
-                          "&:hover": {
-                            background:
-                              "linear-gradient(45deg, #303f9f, #3f51b5)",
-                            cursor: "pointer",
-                          },
-                        }}
-                      >
-                        Sector Allocation
-                      </Typography>
-
+                      {/* Chart */}
                       <Card
                         sx={{
+                          boxShadow: 6,
                           backgroundColor: "#fff",
                           padding: 3,
                           borderRadius: 2,
-                          boxShadow: 2,
-                          mt: 2,
+                          "&:hover": {
+                            boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
+                          },
                         }}
                       >
-                        <Pie
-                          data={{
-                            labels: Object.keys(sectorData),
-                            datasets: [
-                              {
-                                data: Object.values(sectorData),
-                                backgroundColor: [
-                                  "#FF6384",
-                                  "#36A2EB",
-                                  "#FFCE56",
-                                  "#4BC0C0",
-                                  "#FF9F40",
-                                ],
-                                borderWidth: 2,
-                              },
-                            ],
-                          }}
+                        <Line
+                          data={chartData}
                           options={{
                             responsive: true,
                             plugins: {
                               legend: {
                                 position: "top",
                                 labels: {
-                                  font: { size: 14, weight: "bold" },
+                                  font: {
+                                    size: 14,
+                                    weight: "bold",
+                                  },
                                   color: "#333",
                                 },
                               },
                               tooltip: {
                                 callbacks: {
-                                  label: (tooltipItem) =>
-                                    `${
-                                      tooltipItem.label
-                                    }: $${tooltipItem.raw.toFixed(2)}`,
+                                  label: (tooltipItem) => {
+                                    return `Value: $${tooltipItem.raw.toFixed(
+                                      2
+                                    )}`;
+                                  },
+                                },
+                              },
+                            },
+                            scales: {
+                              x: {
+                                grid: {
+                                  display: false,
+                                },
+                                title: {
+                                  display: true,
+                                  text: "Date",
+                                },
+                              },
+                              y: {
+                                ticks: {
+                                  beginAtZero: true,
+                                },
+                                grid: {
+                                  borderColor: "#ddd",
+                                },
+                                title: {
+                                  display: true,
+                                  text: "Portfolio Value",
                                 },
                               },
                             },
                           }}
                         />
                       </Card>
-                    </CardContent>
-                  </Card>
-                </Box>
+                    </Card>
+                  </Grid2>
 
-                {/* Dividend Contribution */}
-                <Box
-                  flex={1}
-                  sx={{
-                    maxWidth: "48%",
-                    boxShadow: 6,
-                    borderRadius: 3,
-                    backgroundColor: "#e8f5e9",
-                  }}
-                >
-                  <Card sx={{ height: "100%" }}>
-                    <CardContent>
-                      <Typography
-                        variant="h6"
-                        gutterBottom
-                        sx={{
-                          fontWeight: "bold",
-                          color: "#fff",
-                          background:
-                            "linear-gradient(45deg, #66bb6a, #43a047)",
-                          padding: "12px 24px",
-                          borderRadius: 2,
-                          textAlign: "center",
-                          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-                          "&:hover": {
+                  {/* Profit/Loss Heatmap */}
+                  <Grid2 item xs={12} sx={{ width: "100%" }}>
+                    <Card
+                      sx={{
+                        boxShadow: 6,
+                        borderRadius: 3,
+                        backgroundColor: "#f3e5f5",
+                      }}
+                    >
+                      <CardContent>
+                        <Typography
+                          variant="h6"
+                          gutterBottom
+                          sx={{
+                            fontWeight: "bold",
+                            color: "#fff",
                             background:
-                              "linear-gradient(45deg, #43a047, #66bb6a)",
-                            cursor: "pointer",
-                          },
-                        }}
-                      >
-                        Dividend Contribution
-                      </Typography>
-
-                      <Card
-                        sx={{
-                          boxShadow: 2,
-                          backgroundColor: "#fff",
-                          padding: 3,
-                          borderRadius: 2,
-                          mt: 2,
-                        }}
-                      >
-                        <Pie
-                          data={{
-                            labels: Object.keys(dividendData),
-                            datasets: [
-                              {
-                                data: Object.values(dividendData),
-                                backgroundColor: [
-                                  "#FF6384",
-                                  "#36A2EB",
-                                  "#FFCE56",
-                                  "#4BC0C0",
-                                  "#FF9F40",
-                                ],
-                                borderWidth: 1,
-                              },
-                            ],
+                              "linear-gradient(45deg, #ab47bc, #8e24aa)",
+                            padding: "12px 24px",
+                            borderRadius: 2,
+                            textAlign: "center",
+                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                            "&:hover": {
+                              background:
+                                "linear-gradient(45deg, #8e24aa, #ab47bc)",
+                              cursor: "pointer",
+                            },
                           }}
-                          options={{
-                            responsive: true,
-                            plugins: {
-                              legend: { position: "top" },
-                              tooltip: {
-                                callbacks: {
-                                  label: (tooltipItem) =>
-                                    `${
-                                      tooltipItem.label
-                                    }: $${tooltipItem.raw.toFixed(2)}`,
+                        >
+                          Stock Performance Heatmap
+                        </Typography>
+
+                        <Card
+                          sx={{
+                            boxShadow: 6,
+                            backgroundColor: "#f9f9f9",
+                            padding: 3,
+                            borderRadius: 2,
+                            mt: 2,
+                            "&:hover": {
+                              boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
+                            },
+                          }}
+                        >
+                          <Bar
+                            data={{
+                              labels: portfolio.map((stock) => stock.stockName),
+                              datasets: [
+                                {
+                                  label: "Profit/Loss",
+                                  data: portfolio.map(
+                                    (stock) =>
+                                      (stock.currentPrice -
+                                        stock.purchasePrice) *
+                                      stock.quantity
+                                  ),
+                                  backgroundColor: portfolio.map((stock) =>
+                                    stock.currentPrice >= stock.purchasePrice
+                                      ? "#4CAF50"
+                                      : "#F44336"
+                                  ),
+                                  borderRadius: 5,
+                                  borderSkipped: false,
+                                  borderWidth: 2,
+                                },
+                              ],
+                            }}
+                            options={{
+                              responsive: true,
+                              plugins: {
+                                legend: {
+                                  position: "top",
+                                  labels: {
+                                    font: {
+                                      size: 14,
+                                      weight: "bold",
+                                    },
+                                    color: "#333",
+                                  },
+                                },
+                                tooltip: {
+                                  callbacks: {
+                                    label: (tooltipItem) => {
+                                      return `${
+                                        tooltipItem.label
+                                      }: $${tooltipItem.raw.toFixed(2)}`;
+                                    },
+                                  },
                                 },
                               },
-                            },
-                          }}
-                        />
-                      </Card>
-                    </CardContent>
-                  </Card>
-                </Box>
-              </Box>
+                            }}
+                          />
+                        </Card>
+                      </CardContent>
+                    </Card>
+                  </Grid2>
 
-              {/* Portfolio Value Over Time */}
-              <Grid2 item xs={12} sx={{ width: "100%" }}>
-                <Card
-                  sx={{
-                    boxShadow: 6,
-                    borderRadius: 3,
-                    backgroundColor: "#f5f5f5",
-                    padding: 3,
-                  }}
-                >
-                  {/* Header with Title and Filter */}
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginBottom: 3,
-                      padding: "12px 24px",
-                      background: "linear-gradient(45deg, #1e88e5, #42a5f5)",
-                      borderRadius: 2,
-                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-                    }}
-                  >
-                    {/* Title */}
-                    <Typography
-                      variant="h6"
-                      sx={{
-                        fontWeight: "bold",
-                        color: "#fff",
-                      }}
-                    >
-                      Portfolio Value Over Time
-                    </Typography>
-
-                    {/* Filter */}
-                    <FormControl
-                      sx={{
-                        minWidth: 200,
-                        backgroundColor: "#fff",
-                        borderRadius: 2,
-                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                        "& .MuiOutlinedInput-root": {
-                          "& fieldset": {
-                            borderColor: "transparent",
-                          },
-                          "&:hover fieldset": {
-                            borderColor: "#1e88e5",
-                          },
-                          "&.Mui-focused fieldset": {
-                            borderColor: "#1e88e5",
-                          },
-                        },
-                      }}
-                    >
-                      <InputLabel
-                        id="stock-select-label"
-                        sx={{ color: "#000" }}
-                      >
-                        Select Stock
-                      </InputLabel>
-                      <Select
-                        labelId="stock-select-label"
-                        id="stock-select"
-                        value={selectedStock}
-                        onChange={handleStockSelection}
-                        label="Select Stock"
-                        sx={{
-                          color: "#1e88e5",
-                          fontWeight: "bold",
-                          "& .MuiSelect-icon": {
-                            color: "#1e88e5",
-                          },
-                        }}
-                      >
-                        <MenuItem value="" sx={{ color: "#1e88e5" }}>
-                          All Stocks
-                        </MenuItem>
-                        {portfolio.map((stock) => (
-                          <MenuItem key={stock.ticker} value={stock.ticker}>
-                            {stock.ticker}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Box>
-
-                  {/* Chart */}
-                  <Card
-                    sx={{
-                      boxShadow: 6,
-                      backgroundColor: "#fff",
-                      padding: 3,
-                      borderRadius: 2,
-                      "&:hover": {
-                        boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-                      },
-                    }}
-                  >
-                    <Line
-                      data={chartData}
-                      options={{
-                        responsive: true,
-                        plugins: {
-                          legend: {
-                            position: "top",
-                            labels: {
-                              font: {
-                                size: 14,
-                                weight: "bold",
-                              },
-                              color: "#333",
-                            },
-                          },
-                          tooltip: {
-                            callbacks: {
-                              label: (tooltipItem) => {
-                                return `Value: $${tooltipItem.raw.toFixed(2)}`;
-                              },
-                            },
-                          },
-                        },
-                        scales: {
-                          x: {
-                            grid: {
-                              display: false,
-                            },
-                            title: {
-                              display: true,
-                              text: "Date",
-                            },
-                          },
-                          y: {
-                            ticks: {
-                              beginAtZero: true,
-                            },
-                            grid: {
-                              borderColor: "#ddd",
-                            },
-                            title: {
-                              display: true,
-                              text: "Portfolio Value",
-                            },
-                          },
-                        },
-                      }}
-                    />
-                  </Card>
-                </Card>
-              </Grid2>
-
-              {/* Profit/Loss Heatmap */}
-              <Grid2 item xs={12} sx={{ width: "100%" }}>
-                <Card
-                  sx={{
-                    boxShadow: 6,
-                    borderRadius: 3,
-                    backgroundColor: "#f3e5f5",
-                  }}
-                >
-                  <CardContent>
-                    <Typography
-                      variant="h6"
-                      gutterBottom
-                      sx={{
-                        fontWeight: "bold",
-                        color: "#fff",
-                        background: "linear-gradient(45deg, #ab47bc, #8e24aa)",
-                        padding: "12px 24px",
-                        borderRadius: 2,
-                        textAlign: "center",
-                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-                        "&:hover": {
-                          background:
-                            "linear-gradient(45deg, #8e24aa, #ab47bc)",
-                          cursor: "pointer",
-                        },
-                      }}
-                    >
-                      Stock Performance Heatmap
-                    </Typography>
-
+                  {/* Profit/Loss Trend */}
+                  <Grid2 item xs={12} sx={{ width: "100%" }}>
                     <Card
                       sx={{
                         boxShadow: 6,
-                        backgroundColor: "#f9f9f9",
-                        padding: 3,
-                        borderRadius: 2,
-                        mt: 2,
-                        "&:hover": {
-                          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-                        },
+                        borderRadius: 3,
+                        backgroundColor: "#f5f5f5",
                       }}
                     >
-                      <Bar
-                        data={{
-                          labels: portfolio.map((stock) => stock.stockName),
-                          datasets: [
-                            {
-                              label: "Profit/Loss",
-                              data: portfolio.map(
-                                (stock) =>
-                                  (stock.currentPrice - stock.purchasePrice) *
-                                  stock.quantity
-                              ),
-                              backgroundColor: portfolio.map((stock) =>
-                                stock.currentPrice >= stock.purchasePrice
-                                  ? "#4CAF50"
-                                  : "#F44336"
-                              ),
-                              borderRadius: 5,
-                              borderSkipped: false,
-                              borderWidth: 2,
+                      <CardContent>
+                        <Typography
+                          variant="h6"
+                          gutterBottom
+                          sx={{
+                            fontWeight: "bold",
+                            color: "#fff",
+                            background:
+                              "linear-gradient(45deg, #1e88e5, #42a5f5)",
+                            padding: "12px 24px",
+                            borderRadius: 2,
+                            textAlign: "center",
+                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                            "&:hover": {
+                              background:
+                                "linear-gradient(45deg, #42a5f5, #1e88e5)",
+                              cursor: "pointer",
                             },
-                          ],
-                        }}
-                        options={{
-                          responsive: true,
-                          plugins: {
-                            legend: {
-                              position: "top",
-                              labels: {
-                                font: {
-                                  size: 14,
-                                  weight: "bold",
-                                },
-                                color: "#333",
-                              },
-                            },
-                            tooltip: {
-                              callbacks: {
-                                label: (tooltipItem) => {
-                                  return `${
-                                    tooltipItem.label
-                                  }: $${tooltipItem.raw.toFixed(2)}`;
-                                },
-                              },
-                            },
-                          },
-                        }}
-                      />
-                    </Card>
-                  </CardContent>
-                </Card>
-              </Grid2>
+                          }}
+                        >
+                          Profit/Loss Trend
+                        </Typography>
 
-              {/* Profit/Loss Trend */}
-              <Grid2 item xs={12} sx={{ width: "100%" }}>
-                <Card
-                  sx={{
-                    boxShadow: 6,
-                    borderRadius: 3,
-                    backgroundColor: "#f5f5f5",
-                  }}
-                >
-                  <CardContent>
-                    <Typography
-                      variant="h6"
-                      gutterBottom
-                      sx={{
-                        fontWeight: "bold",
-                        color: "#fff",
-                        background: "linear-gradient(45deg, #1e88e5, #42a5f5)",
-                        padding: "12px 24px",
-                        borderRadius: 2,
-                        textAlign: "center",
-                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-                        "&:hover": {
-                          background:
-                            "linear-gradient(45deg, #42a5f5, #1e88e5)",
-                          cursor: "pointer",
-                        },
-                      }}
-                    >
-                      Profit/Loss Trend
-                    </Typography>
-
-                    <Card
-                      sx={{
-                        boxShadow: 6,
-                        backgroundColor: "#fff",
-                        padding: 3,
-                        borderRadius: 2,
-                        mt: 2,
-                        "&:hover": {
-                          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-                        },
-                      }}
-                    >
-                      <Line
-                        data={{
-                          labels: portfolio.map((stock) => stock.stockName),
-                          datasets: [
-                            {
-                              label: "Profit/Loss",
-                              data: portfolio.map(
-                                (stock) =>
-                                  (stock.currentPrice - stock.purchasePrice) *
-                                  stock.quantity
-                              ),
-                              borderColor: "#42A5F5",
-                              backgroundColor: "rgba(66, 165, 245, 0.2)",
-                              fill: true,
-                              borderWidth: 3,
-                              tension: 0.4,
+                        <Card
+                          sx={{
+                            boxShadow: 6,
+                            backgroundColor: "#fff",
+                            padding: 3,
+                            borderRadius: 2,
+                            mt: 2,
+                            "&:hover": {
+                              boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
                             },
-                          ],
-                        }}
-                        options={{
-                          responsive: true,
-                          plugins: {
-                            legend: {
-                              position: "top",
-                              labels: {
-                                font: {
-                                  size: 14,
-                                  weight: "bold",
+                          }}
+                        >
+                          <Line
+                            data={{
+                              labels: portfolio.map((stock) => stock.stockName),
+                              datasets: [
+                                {
+                                  label: "Profit/Loss",
+                                  data: portfolio.map(
+                                    (stock) =>
+                                      (stock.currentPrice -
+                                        stock.purchasePrice) *
+                                      stock.quantity
+                                  ),
+                                  borderColor: "#42A5F5",
+                                  backgroundColor: "rgba(66, 165, 245, 0.2)",
+                                  fill: true,
+                                  borderWidth: 3,
+                                  tension: 0.4,
                                 },
-                                color: "#333",
-                              },
-                            },
-                            tooltip: {
-                              callbacks: {
-                                label: (tooltipItem) => {
-                                  return `${
-                                    tooltipItem.label
-                                  }: $${tooltipItem.raw.toFixed(2)}`;
+                              ],
+                            }}
+                            options={{
+                              responsive: true,
+                              plugins: {
+                                legend: {
+                                  position: "top",
+                                  labels: {
+                                    font: {
+                                      size: 14,
+                                      weight: "bold",
+                                    },
+                                    color: "#333",
+                                  },
+                                },
+                                tooltip: {
+                                  callbacks: {
+                                    label: (tooltipItem) => {
+                                      return `${
+                                        tooltipItem.label
+                                      }: $${tooltipItem.raw.toFixed(2)}`;
+                                    },
+                                  },
                                 },
                               },
-                            },
-                          },
-                          scales: {
-                            x: {
-                              grid: {
-                                display: false,
+                              scales: {
+                                x: {
+                                  grid: {
+                                    display: false,
+                                  },
+                                },
+                                y: {
+                                  ticks: {
+                                    beginAtZero: true,
+                                  },
+                                  grid: {
+                                    borderColor: "#ddd",
+                                  },
+                                },
                               },
-                            },
-                            y: {
-                              ticks: {
-                                beginAtZero: true,
-                              },
-                              grid: {
-                                borderColor: "#ddd",
-                              },
-                            },
-                          },
-                        }}
-                      />
+                            }}
+                          />
+                        </Card>
+                      </CardContent>
                     </Card>
-                  </CardContent>
-                </Card>
-              </Grid2>
-            </Grid2>
+                  </Grid2>
+                </Grid2>
+              )}
+            </>
           )}
         </>
       )}

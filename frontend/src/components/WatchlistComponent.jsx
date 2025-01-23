@@ -44,16 +44,20 @@ const WatchlistComponent = () => {
   const [quantity, setQuantity] = useState(1);
   const userId = localStorage.getItem("userId");
   const [filteredStocks, setFilteredStocks] = useState([]);
+  const [stockIdsLoading, setStockIdsLoading] = useState(true);
 
   useEffect(() => {
     const fetchWatchlist = async () => {
       try {
+        setStockIdsLoading(true)
         const response = await axios.get(
           `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/watchlist`
         );
         setStockIds(response.data);
       } catch (err) {
         setError("Failed to fetch watchlist");
+      } finally {
+        setStockIdsLoading(false); 
       }
     };
 
@@ -62,7 +66,15 @@ const WatchlistComponent = () => {
 
   useEffect(() => {
     const fetchStocks = async () => {
+      if (stockIdsLoading) return;
       try {
+        setLoading(true);
+        if (stockIds.length === 0) {
+          setStocks([]);
+          setFilteredStocks([]);
+          return; 
+        }
+  
         const stockDetails = await Promise.all(
           stockIds.map((id) => axios.get(`https://simple-portfolio-tracker-1-durb.onrender.com/stocks/${id}`))
         );
@@ -85,10 +97,10 @@ const WatchlistComponent = () => {
       }
     };
 
-    if (stockIds.length > 0) {
+    if (!stockIdsLoading) {
       fetchStocks();
     }
-  }, [stockIds]);
+  }, [stockIds, stockIdsLoading]);
 
   // Filtering Handlers
   const handleSearch = (searchValue) => {
