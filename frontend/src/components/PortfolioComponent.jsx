@@ -134,18 +134,22 @@ const PortfolioComponent = ({
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
-  
+
     const fetchPortfolio = async () => {
       setLoading(true);
       try {
         const [portfolioResponse, allStocksResponse] = await Promise.all([
-          axios.get(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/portfolio`),
-          axios.get("https://simple-portfolio-tracker-1-durb.onrender.com/stocks"),
+          axios.get(
+            `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/portfolio`
+          ),
+          axios.get(
+            "https://simple-portfolio-tracker-1-durb.onrender.com/stocks"
+          ),
         ]);
-  
+
         const portfolioData = portfolioResponse.data;
         const allStocks = allStocksResponse.data;
-  
+
         const matchedPortfolio = portfolioData.map((portfolioStock) => {
           const stockDetails = allStocks.find(
             (stock) => stock.ticker === portfolioStock.ticker
@@ -163,10 +167,10 @@ const PortfolioComponent = ({
                 currentPrice: portfolioStock.purchasePrice,
               };
         });
-  
+
         const sectorData = calculateSectorData(matchedPortfolio);
         setSectorData(sectorData);
-  
+
         await fetchPortfolioHistory(matchedPortfolio);
         setPortfolio(matchedPortfolio);
         calculateSummary(matchedPortfolio);
@@ -177,32 +181,44 @@ const PortfolioComponent = ({
         setLoading(false);
       }
     };
-  
+
     const calculateSectorData = (portfolio) => {
       const sectorMap = {
-        Tech: ["AAPL", "MSFT", "GOOGL", "NVDA", "TSLA", "AMD", "INTC", "CSCO", "ADBE", "CRM"],
+        Tech: [
+          "AAPL",
+          "MSFT",
+          "GOOGL",
+          "NVDA",
+          "TSLA",
+          "AMD",
+          "INTC",
+          "CSCO",
+          "ADBE",
+          "CRM",
+        ],
         Healthcare: ["JNJ", "PFE", "MRK"],
         Finance: ["BRK.A", "V", "MA", "JPM", "GS", "C"],
         Energy: ["XOM", "CVX"],
         Consumer: ["KO", "PEP", "PG", "WMT", "TGT", "HD"],
       };
-  
+
       return portfolio.reduce((acc, stock) => {
-        const sector = Object.keys(sectorMap).find((key) =>
-          sectorMap[key].includes(stock.ticker)
-        ) || "Other";
+        const sector =
+          Object.keys(sectorMap).find((key) =>
+            sectorMap[key].includes(stock.ticker)
+          ) || "Other";
         acc[sector] = (acc[sector] || 0) + stock.currentPrice * stock.quantity;
         return acc;
       }, {});
     };
-  
+
     const fetchPortfolioHistory = async (portfolio) => {
       try {
         const response = await axios.get(
           `https://simple-portfolio-tracker-1-durb.onrender.com/api/portfolio/history/${userId}`
         );
         const data = response.data;
-  
+
         setTimelineData(
           data.map((entry) => ({
             timestamp: entry.timestamp,
@@ -210,7 +226,7 @@ const PortfolioComponent = ({
             value: entry.totalValue,
           }))
         );
-  
+
         if (data.length) {
           await fetchStockPricesFromTimestamp(portfolio, data[0].timestamp);
         }
@@ -218,7 +234,7 @@ const PortfolioComponent = ({
         console.error("Error fetching portfolio history:", error);
       }
     };
-  
+
     const fetchStockPricesFromTimestamp = async (portfolio, timestamp) => {
       try {
         const stockPriceData = await Promise.all(
@@ -244,10 +260,9 @@ const PortfolioComponent = ({
         console.error("Error fetching stock price history:", error);
       }
     };
-  
+
     fetchPortfolio();
   }, []);
-  
 
   const calculateSummary = (data) => {
     const totalValue = data.reduce(
@@ -303,34 +318,35 @@ const PortfolioComponent = ({
     setSelectedStock(event.target.value);
   };
 
-
   const filteredTimelineData =
     selectedStock === ""
-      ? timelineData 
+      ? timelineData
       : stockPriceHistory.find((entry) => entry.ticker === selectedStock)
           ?.prices || [];
-
 
   // Chart Data
   const chartData = {
     labels: filteredTimelineData.map((entry) => {
       const dateObj = new Date(entry.timestamp);
-      const formattedDate = dateObj.toLocaleDateString(); 
-      const formattedTime = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); 
+      const formattedDate = dateObj.toLocaleDateString();
+      const formattedTime = dateObj.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
       return `${formattedDate}`;
     }),
     datasets: [
       {
         label: `Portfolio Value (${selectedStock || "All Stocks"})`,
-        data: filteredTimelineData.map(
-          (entry) => (selectedStock === "" ? entry.value : entry.price)
+        data: filteredTimelineData.map((entry) =>
+          selectedStock === "" ? entry.value : entry.price
         ),
         borderColor: "#42A5F5",
         fill: false,
       },
     ],
   };
-  
+
   const handleExport = () => {
     if (!portfolio.length) {
       console.warn("No portfolio data to export.");
@@ -889,43 +905,367 @@ const PortfolioComponent = ({
           <Divider sx={{ mb: 4 }} />
 
           {/* Charts */}
-          <Grid2 container spacing={3}>
+          {filteredPortfolio.length === 0 ? (
             <Typography
-              variant="h5"
-              gutterBottom
-              sx={{
-                fontWeight: "bold",
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                color: (theme) => theme.palette.primary.main,
-                textTransform: "uppercase",
-                "&:hover": {
-                  textShadow: "0px 2px 4px rgba(0, 0, 0, 0.3)",
-                  cursor: "pointer",
-                },
-              }}
+              variant="h6"
+              sx={{ textAlign: "center", color: "#888", margin: "20px 0" }}
             >
-              <TrendingUpIcon sx={{ marginRight: 1 }} /> Performance Trends
+              {" "}
+              No data available in your portfolio.
             </Typography>
-            {/* Sector Allocation and Dividend Contribution */}
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="stretch"
-              sx={{ width: "100%" }}
-            >
-              {/* Sector Allocation */}
-              <Box
-                flex={1}
+          ) : (
+            <Grid2 container spacing={3}>
+              <Typography
+                variant="h5"
+                gutterBottom
                 sx={{
-                  maxWidth: "48%",
-                  boxShadow: 6,
-                  borderRadius: 3,
-                  backgroundColor: "#1a237e",
+                  fontWeight: "bold",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  color: (theme) => theme.palette.primary.main,
+                  textTransform: "uppercase",
+                  "&:hover": {
+                    textShadow: "0px 2px 4px rgba(0, 0, 0, 0.3)",
+                    cursor: "pointer",
+                  },
                 }}
               >
-                <Card sx={{ height: "100%" }}>
+                <TrendingUpIcon sx={{ marginRight: 1 }} /> Performance Trends
+              </Typography>
+              {/* Sector Allocation and Dividend Contribution */}
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="stretch"
+                sx={{ width: "100%" }}
+              >
+                {/* Sector Allocation */}
+                <Box
+                  flex={1}
+                  sx={{
+                    maxWidth: "48%",
+                    boxShadow: 6,
+                    borderRadius: 3,
+                    backgroundColor: "#1a237e",
+                  }}
+                >
+                  <Card sx={{ height: "100%" }}>
+                    <CardContent>
+                      <Typography
+                        variant="h6"
+                        gutterBottom
+                        sx={{
+                          fontWeight: "bold",
+                          color: "#fff",
+                          padding: "12px 24px",
+                          borderRadius: 2,
+                          background:
+                            "linear-gradient(45deg, #3f51b5, #303f9f)",
+                          textAlign: "center",
+                          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+                          "&:hover": {
+                            background:
+                              "linear-gradient(45deg, #303f9f, #3f51b5)",
+                            cursor: "pointer",
+                          },
+                        }}
+                      >
+                        Sector Allocation
+                      </Typography>
+
+                      <Card
+                        sx={{
+                          backgroundColor: "#fff",
+                          padding: 3,
+                          borderRadius: 2,
+                          boxShadow: 2,
+                          mt: 2,
+                        }}
+                      >
+                        <Pie
+                          data={{
+                            labels: Object.keys(sectorData),
+                            datasets: [
+                              {
+                                data: Object.values(sectorData),
+                                backgroundColor: [
+                                  "#FF6384",
+                                  "#36A2EB",
+                                  "#FFCE56",
+                                  "#4BC0C0",
+                                  "#FF9F40",
+                                ],
+                                borderWidth: 2,
+                              },
+                            ],
+                          }}
+                          options={{
+                            responsive: true,
+                            plugins: {
+                              legend: {
+                                position: "top",
+                                labels: {
+                                  font: { size: 14, weight: "bold" },
+                                  color: "#333",
+                                },
+                              },
+                              tooltip: {
+                                callbacks: {
+                                  label: (tooltipItem) =>
+                                    `${
+                                      tooltipItem.label
+                                    }: $${tooltipItem.raw.toFixed(2)}`,
+                                },
+                              },
+                            },
+                          }}
+                        />
+                      </Card>
+                    </CardContent>
+                  </Card>
+                </Box>
+
+                {/* Dividend Contribution */}
+                <Box
+                  flex={1}
+                  sx={{
+                    maxWidth: "48%",
+                    boxShadow: 6,
+                    borderRadius: 3,
+                    backgroundColor: "#e8f5e9",
+                  }}
+                >
+                  <Card sx={{ height: "100%" }}>
+                    <CardContent>
+                      <Typography
+                        variant="h6"
+                        gutterBottom
+                        sx={{
+                          fontWeight: "bold",
+                          color: "#fff",
+                          background:
+                            "linear-gradient(45deg, #66bb6a, #43a047)",
+                          padding: "12px 24px",
+                          borderRadius: 2,
+                          textAlign: "center",
+                          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                          "&:hover": {
+                            background:
+                              "linear-gradient(45deg, #43a047, #66bb6a)",
+                            cursor: "pointer",
+                          },
+                        }}
+                      >
+                        Dividend Contribution
+                      </Typography>
+
+                      <Card
+                        sx={{
+                          boxShadow: 2,
+                          backgroundColor: "#fff",
+                          padding: 3,
+                          borderRadius: 2,
+                          mt: 2,
+                        }}
+                      >
+                        <Pie
+                          data={{
+                            labels: Object.keys(dividendData),
+                            datasets: [
+                              {
+                                data: Object.values(dividendData),
+                                backgroundColor: [
+                                  "#FF6384",
+                                  "#36A2EB",
+                                  "#FFCE56",
+                                  "#4BC0C0",
+                                  "#FF9F40",
+                                ],
+                                borderWidth: 1,
+                              },
+                            ],
+                          }}
+                          options={{
+                            responsive: true,
+                            plugins: {
+                              legend: { position: "top" },
+                              tooltip: {
+                                callbacks: {
+                                  label: (tooltipItem) =>
+                                    `${
+                                      tooltipItem.label
+                                    }: $${tooltipItem.raw.toFixed(2)}`,
+                                },
+                              },
+                            },
+                          }}
+                        />
+                      </Card>
+                    </CardContent>
+                  </Card>
+                </Box>
+              </Box>
+
+              {/* Portfolio Value Over Time */}
+              <Grid2 item xs={12} sx={{ width: "100%" }}>
+                <Card
+                  sx={{
+                    boxShadow: 6,
+                    borderRadius: 3,
+                    backgroundColor: "#f5f5f5",
+                    padding: 3,
+                  }}
+                >
+                  {/* Header with Title and Filter */}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      marginBottom: 3,
+                      padding: "12px 24px",
+                      background: "linear-gradient(45deg, #1e88e5, #42a5f5)",
+                      borderRadius: 2,
+                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                    }}
+                  >
+                    {/* Title */}
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: "bold",
+                        color: "#fff",
+                      }}
+                    >
+                      Portfolio Value Over Time
+                    </Typography>
+
+                    {/* Filter */}
+                    <FormControl
+                      sx={{
+                        minWidth: 200,
+                        backgroundColor: "#fff",
+                        borderRadius: 2,
+                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                        "& .MuiOutlinedInput-root": {
+                          "& fieldset": {
+                            borderColor: "transparent",
+                          },
+                          "&:hover fieldset": {
+                            borderColor: "#1e88e5",
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: "#1e88e5",
+                          },
+                        },
+                      }}
+                    >
+                      <InputLabel
+                        id="stock-select-label"
+                        sx={{ color: "#000" }}
+                      >
+                        Select Stock
+                      </InputLabel>
+                      <Select
+                        labelId="stock-select-label"
+                        id="stock-select"
+                        value={selectedStock}
+                        onChange={handleStockSelection}
+                        label="Select Stock"
+                        sx={{
+                          color: "#1e88e5",
+                          fontWeight: "bold",
+                          "& .MuiSelect-icon": {
+                            color: "#1e88e5",
+                          },
+                        }}
+                      >
+                        <MenuItem value="" sx={{ color: "#1e88e5" }}>
+                          All Stocks
+                        </MenuItem>
+                        {portfolio.map((stock) => (
+                          <MenuItem key={stock.ticker} value={stock.ticker}>
+                            {stock.ticker}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Box>
+
+                  {/* Chart */}
+                  <Card
+                    sx={{
+                      boxShadow: 6,
+                      backgroundColor: "#fff",
+                      padding: 3,
+                      borderRadius: 2,
+                      "&:hover": {
+                        boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
+                      },
+                    }}
+                  >
+                    <Line
+                      data={chartData}
+                      options={{
+                        responsive: true,
+                        plugins: {
+                          legend: {
+                            position: "top",
+                            labels: {
+                              font: {
+                                size: 14,
+                                weight: "bold",
+                              },
+                              color: "#333",
+                            },
+                          },
+                          tooltip: {
+                            callbacks: {
+                              label: (tooltipItem) => {
+                                return `Value: $${tooltipItem.raw.toFixed(2)}`;
+                              },
+                            },
+                          },
+                        },
+                        scales: {
+                          x: {
+                            grid: {
+                              display: false,
+                            },
+                            title: {
+                              display: true,
+                              text: "Date",
+                            },
+                          },
+                          y: {
+                            ticks: {
+                              beginAtZero: true,
+                            },
+                            grid: {
+                              borderColor: "#ddd",
+                            },
+                            title: {
+                              display: true,
+                              text: "Portfolio Value",
+                            },
+                          },
+                        },
+                      }}
+                    />
+                  </Card>
+                </Card>
+              </Grid2>
+
+              {/* Profit/Loss Heatmap */}
+              <Grid2 item xs={12} sx={{ width: "100%" }}>
+                <Card
+                  sx={{
+                    boxShadow: 6,
+                    borderRadius: 3,
+                    backgroundColor: "#f3e5f5",
+                  }}
+                >
                   <CardContent>
                     <Typography
                       variant="h6"
@@ -933,43 +1273,51 @@ const PortfolioComponent = ({
                       sx={{
                         fontWeight: "bold",
                         color: "#fff",
+                        background: "linear-gradient(45deg, #ab47bc, #8e24aa)",
                         padding: "12px 24px",
                         borderRadius: 2,
-                        background: "linear-gradient(45deg, #3f51b5, #303f9f)",
                         textAlign: "center",
-                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
                         "&:hover": {
                           background:
-                            "linear-gradient(45deg, #303f9f, #3f51b5)",
+                            "linear-gradient(45deg, #8e24aa, #ab47bc)",
                           cursor: "pointer",
                         },
                       }}
                     >
-                      Sector Allocation
+                      Stock Performance Heatmap
                     </Typography>
 
                     <Card
                       sx={{
-                        backgroundColor: "#fff",
+                        boxShadow: 6,
+                        backgroundColor: "#f9f9f9",
                         padding: 3,
                         borderRadius: 2,
-                        boxShadow: 2,
                         mt: 2,
+                        "&:hover": {
+                          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
+                        },
                       }}
                     >
-                      <Pie
+                      <Bar
                         data={{
-                          labels: Object.keys(sectorData),
+                          labels: portfolio.map((stock) => stock.stockName),
                           datasets: [
                             {
-                              data: Object.values(sectorData),
-                              backgroundColor: [
-                                "#FF6384",
-                                "#36A2EB",
-                                "#FFCE56",
-                                "#4BC0C0",
-                                "#FF9F40",
-                              ],
+                              label: "Profit/Loss",
+                              data: portfolio.map(
+                                (stock) =>
+                                  (stock.currentPrice - stock.purchasePrice) *
+                                  stock.quantity
+                              ),
+                              backgroundColor: portfolio.map((stock) =>
+                                stock.currentPrice >= stock.purchasePrice
+                                  ? "#4CAF50"
+                                  : "#F44336"
+                              ),
+                              borderRadius: 5,
+                              borderSkipped: false,
                               borderWidth: 2,
                             },
                           ],
@@ -980,16 +1328,20 @@ const PortfolioComponent = ({
                             legend: {
                               position: "top",
                               labels: {
-                                font: { size: 14, weight: "bold" },
+                                font: {
+                                  size: 14,
+                                  weight: "bold",
+                                },
                                 color: "#333",
                               },
                             },
                             tooltip: {
                               callbacks: {
-                                label: (tooltipItem) =>
-                                  `${
+                                label: (tooltipItem) => {
+                                  return `${
                                     tooltipItem.label
-                                  }: $${tooltipItem.raw.toFixed(2)}`,
+                                  }: $${tooltipItem.raw.toFixed(2)}`;
+                                },
                               },
                             },
                           },
@@ -998,19 +1350,17 @@ const PortfolioComponent = ({
                     </Card>
                   </CardContent>
                 </Card>
-              </Box>
+              </Grid2>
 
-              {/* Dividend Contribution */}
-              <Box
-                flex={1}
-                sx={{
-                  maxWidth: "48%",
-                  boxShadow: 6,
-                  borderRadius: 3,
-                  backgroundColor: "#e8f5e9",
-                }}
-              >
-                <Card sx={{ height: "100%" }}>
+              {/* Profit/Loss Trend */}
+              <Grid2 item xs={12} sx={{ width: "100%" }}>
+                <Card
+                  sx={{
+                    boxShadow: 6,
+                    borderRadius: 3,
+                    backgroundColor: "#f5f5f5",
+                  }}
+                >
                   <CardContent>
                     <Typography
                       variant="h6"
@@ -1018,57 +1368,87 @@ const PortfolioComponent = ({
                       sx={{
                         fontWeight: "bold",
                         color: "#fff",
-                        background: "linear-gradient(45deg, #66bb6a, #43a047)",
+                        background: "linear-gradient(45deg, #1e88e5, #42a5f5)",
                         padding: "12px 24px",
                         borderRadius: 2,
                         textAlign: "center",
                         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
                         "&:hover": {
                           background:
-                            "linear-gradient(45deg, #43a047, #66bb6a)",
+                            "linear-gradient(45deg, #42a5f5, #1e88e5)",
                           cursor: "pointer",
                         },
                       }}
                     >
-                      Dividend Contribution
+                      Profit/Loss Trend
                     </Typography>
 
                     <Card
                       sx={{
-                        boxShadow: 2,
+                        boxShadow: 6,
                         backgroundColor: "#fff",
                         padding: 3,
                         borderRadius: 2,
                         mt: 2,
+                        "&:hover": {
+                          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
+                        },
                       }}
                     >
-                      <Pie
+                      <Line
                         data={{
-                          labels: Object.keys(dividendData),
+                          labels: portfolio.map((stock) => stock.stockName),
                           datasets: [
                             {
-                              data: Object.values(dividendData),
-                              backgroundColor: [
-                                "#FF6384",
-                                "#36A2EB",
-                                "#FFCE56",
-                                "#4BC0C0",
-                                "#FF9F40",
-                              ],
-                              borderWidth: 1,
+                              label: "Profit/Loss",
+                              data: portfolio.map(
+                                (stock) =>
+                                  (stock.currentPrice - stock.purchasePrice) *
+                                  stock.quantity
+                              ),
+                              borderColor: "#42A5F5",
+                              backgroundColor: "rgba(66, 165, 245, 0.2)",
+                              fill: true,
+                              borderWidth: 3,
+                              tension: 0.4,
                             },
                           ],
                         }}
                         options={{
                           responsive: true,
                           plugins: {
-                            legend: { position: "top" },
+                            legend: {
+                              position: "top",
+                              labels: {
+                                font: {
+                                  size: 14,
+                                  weight: "bold",
+                                },
+                                color: "#333",
+                              },
+                            },
                             tooltip: {
                               callbacks: {
-                                label: (tooltipItem) =>
-                                  `${
+                                label: (tooltipItem) => {
+                                  return `${
                                     tooltipItem.label
-                                  }: $${tooltipItem.raw.toFixed(2)}`,
+                                  }: $${tooltipItem.raw.toFixed(2)}`;
+                                },
+                              },
+                            },
+                          },
+                          scales: {
+                            x: {
+                              grid: {
+                                display: false,
+                              },
+                            },
+                            y: {
+                              ticks: {
+                                beginAtZero: true,
+                              },
+                              grid: {
+                                borderColor: "#ddd",
                               },
                             },
                           },
@@ -1077,356 +1457,9 @@ const PortfolioComponent = ({
                     </Card>
                   </CardContent>
                 </Card>
-              </Box>
-            </Box>
-
-            {/* Portfolio Value Over Time */}
-            <Grid2 item xs={12} sx={{ width: "100%" }}>
-              <Card
-                sx={{
-                  boxShadow: 6,
-                  borderRadius: 3,
-                  backgroundColor: "#f5f5f5",
-                  padding: 3,
-                }}
-              >
-                {/* Header with Title and Filter */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 3,
-                    padding: "12px 24px",
-                    background: "linear-gradient(45deg, #1e88e5, #42a5f5)",
-                    borderRadius: 2,
-                    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-                  }}
-                >
-                  {/* Title */}
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: "bold",
-                      color: "#fff",
-                    }}
-                  >
-                    Portfolio Value Over Time
-                  </Typography>
-
-                  {/* Filter */}
-                  <FormControl
-                    sx={{
-                      minWidth: 200,
-                      backgroundColor: "#fff",
-                      borderRadius: 2,
-                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": {
-                          borderColor: "transparent",
-                        },
-                        "&:hover fieldset": {
-                          borderColor: "#1e88e5",
-                        },
-                        "&.Mui-focused fieldset": {
-                          borderColor: "#1e88e5",
-                        },
-                      },
-                    }}
-                  >
-                    <InputLabel id="stock-select-label" sx={{ color: "#000" }}>
-                      Select Stock
-                    </InputLabel>
-                    <Select
-                      labelId="stock-select-label"
-                      id="stock-select"
-                      value={selectedStock}
-                      onChange={handleStockSelection}
-                      label="Select Stock"
-                      sx={{
-                        color: "#1e88e5",
-                        fontWeight: "bold",
-                        "& .MuiSelect-icon": {
-                          color: "#1e88e5",
-                        },
-                      }}
-                    >
-                      <MenuItem value="" sx={{ color: "#1e88e5" }}>
-                        All Stocks
-                      </MenuItem>
-                      {portfolio.map((stock) => (
-                        <MenuItem key={stock.ticker} value={stock.ticker}>
-                          {stock.ticker}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Box>
-
-                {/* Chart */}
-                <Card
-                  sx={{
-                    boxShadow: 6,
-                    backgroundColor: "#fff",
-                    padding: 3,
-                    borderRadius: 2,
-                    "&:hover": {
-                      boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-                    },
-                  }}
-                >
-                  <Line
-                    data={chartData}
-                    options={{
-                      responsive: true,
-                      plugins: {
-                        legend: {
-                          position: "top",
-                          labels: {
-                            font: {
-                              size: 14,
-                              weight: "bold",
-                            },
-                            color: "#333",
-                          },
-                        },
-                        tooltip: {
-                          callbacks: {
-                            label: (tooltipItem) => {
-                              return `Value: $${tooltipItem.raw.toFixed(2)}`;
-                            },
-                          },
-                        },
-                      },
-                      scales: {
-                        x: {
-                          grid: {
-                            display: false,
-                          },
-                          title: {
-                            display: true,
-                            text: "Date",
-                          },
-                        },
-                        y: {
-                          ticks: {
-                            beginAtZero: true,
-                          },
-                          grid: {
-                            borderColor: "#ddd",
-                          },
-                          title: {
-                            display: true,
-                            text: "Portfolio Value",
-                          },
-                        },
-                      },
-                    }}
-                  />
-                </Card>
-              </Card>
+              </Grid2>
             </Grid2>
-
-            {/* Profit/Loss Heatmap */}
-            <Grid2 item xs={12} sx={{ width: "100%" }}>
-              <Card
-                sx={{
-                  boxShadow: 6,
-                  borderRadius: 3,
-                  backgroundColor: "#f3e5f5",
-                }}
-              >
-                <CardContent>
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    sx={{
-                      fontWeight: "bold",
-                      color: "#fff",
-                      background: "linear-gradient(45deg, #ab47bc, #8e24aa)",
-                      padding: "12px 24px",
-                      borderRadius: 2,
-                      textAlign: "center",
-                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-                      "&:hover": {
-                        background: "linear-gradient(45deg, #8e24aa, #ab47bc)",
-                        cursor: "pointer",
-                      },
-                    }}
-                  >
-                    Stock Performance Heatmap
-                  </Typography>
-
-                  <Card
-                    sx={{
-                      boxShadow: 6,
-                      backgroundColor: "#f9f9f9",
-                      padding: 3,
-                      borderRadius: 2,
-                      mt: 2,
-                      "&:hover": {
-                        boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-                      },
-                    }}
-                  >
-                    <Bar
-                      data={{
-                        labels: portfolio.map((stock) => stock.stockName),
-                        datasets: [
-                          {
-                            label: "Profit/Loss",
-                            data: portfolio.map(
-                              (stock) =>
-                                (stock.currentPrice - stock.purchasePrice) *
-                                stock.quantity
-                            ),
-                            backgroundColor: portfolio.map((stock) =>
-                              stock.currentPrice >= stock.purchasePrice
-                                ? "#4CAF50"
-                                : "#F44336"
-                            ),
-                            borderRadius: 5,
-                            borderSkipped: false,
-                            borderWidth: 2,
-                          },
-                        ],
-                      }}
-                      options={{
-                        responsive: true,
-                        plugins: {
-                          legend: {
-                            position: "top",
-                            labels: {
-                              font: {
-                                size: 14,
-                                weight: "bold",
-                              },
-                              color: "#333",
-                            },
-                          },
-                          tooltip: {
-                            callbacks: {
-                              label: (tooltipItem) => {
-                                return `${
-                                  tooltipItem.label
-                                }: $${tooltipItem.raw.toFixed(2)}`;
-                              },
-                            },
-                          },
-                        },
-                      }}
-                    />
-                  </Card>
-                </CardContent>
-              </Card>
-            </Grid2>
-
-            {/* Profit/Loss Trend */}
-            <Grid2 item xs={12} sx={{ width: "100%" }}>
-              <Card
-                sx={{
-                  boxShadow: 6,
-                  borderRadius: 3,
-                  backgroundColor: "#f5f5f5",
-                }}
-              >
-                <CardContent>
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    sx={{
-                      fontWeight: "bold",
-                      color: "#fff",
-                      background: "linear-gradient(45deg, #1e88e5, #42a5f5)",
-                      padding: "12px 24px",
-                      borderRadius: 2,
-                      textAlign: "center",
-                      boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-                      "&:hover": {
-                        background: "linear-gradient(45deg, #42a5f5, #1e88e5)",
-                        cursor: "pointer",
-                      },
-                    }}
-                  >
-                    Profit/Loss Trend
-                  </Typography>
-
-                  <Card
-                    sx={{
-                      boxShadow: 6,
-                      backgroundColor: "#fff",
-                      padding: 3,
-                      borderRadius: 2,
-                      mt: 2,
-                      "&:hover": {
-                        boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
-                      },
-                    }}
-                  >
-                    <Line
-                      data={{
-                        labels: portfolio.map((stock) => stock.stockName),
-                        datasets: [
-                          {
-                            label: "Profit/Loss",
-                            data: portfolio.map(
-                              (stock) =>
-                                (stock.currentPrice - stock.purchasePrice) *
-                                stock.quantity
-                            ),
-                            borderColor: "#42A5F5",
-                            backgroundColor: "rgba(66, 165, 245, 0.2)",
-                            fill: true,
-                            borderWidth: 3,
-                            tension: 0.4,
-                          },
-                        ],
-                      }}
-                      options={{
-                        responsive: true,
-                        plugins: {
-                          legend: {
-                            position: "top",
-                            labels: {
-                              font: {
-                                size: 14,
-                                weight: "bold",
-                              },
-                              color: "#333",
-                            },
-                          },
-                          tooltip: {
-                            callbacks: {
-                              label: (tooltipItem) => {
-                                return `${
-                                  tooltipItem.label
-                                }: $${tooltipItem.raw.toFixed(2)}`;
-                              },
-                            },
-                          },
-                        },
-                        scales: {
-                          x: {
-                            grid: {
-                              display: false,
-                            },
-                          },
-                          y: {
-                            ticks: {
-                              beginAtZero: true,
-                            },
-                            grid: {
-                              borderColor: "#ddd",
-                            },
-                          },
-                        },
-                      }}
-                    />
-                  </Card>
-                </CardContent>
-              </Card>
-            </Grid2>
-          </Grid2>
+          )}
         </>
       )}
     </Container>

@@ -58,12 +58,17 @@ const TransactionsComponent = () => {
     const fetchData = async () => {
       try {
         const [fundsResponse, transactionsResponse] = await Promise.all([
-          axios.get(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/funds`),
-          axios.get(`https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/transactions`),
+          axios.get(
+            `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/funds`
+          ),
+          axios.get(
+            `https://simple-portfolio-tracker-1-durb.onrender.com/api/users/${userId}/transactions`
+          ),
         ]);
 
         setFunds(fundsResponse.data);
         setTransactions(transactionsResponse.data);
+        //console.log(transactionsResponse.data);
         setFilteredTransactions(transactionsResponse.data);
         const spent = transactionsResponse.data
           .filter((t) => t.action === "BUY")
@@ -108,7 +113,7 @@ const TransactionsComponent = () => {
         );
       }
 
-      setFilteredTransactions(filtered); 
+      setFilteredTransactions(filtered);
     };
 
     applyFilters();
@@ -175,7 +180,9 @@ const TransactionsComponent = () => {
         transaction.price.toFixed(2),
         transaction.amount.toFixed(2),
         new Date(transaction.date).toLocaleDateString(),
-        new Date(transaction.date).toLocaleTimeString(),
+        new Date(transaction.date).toLocaleTimeString("en-IN", {
+          timeZone: "Asia/Kolkata",
+        }),
       ]),
     ]
       .map((row) => row.join(","))
@@ -375,9 +382,9 @@ const TransactionsComponent = () => {
             onChange={handleSearchChange}
             value={searchText}
             sx={{
-              bgcolor: "#ffffff", 
+              bgcolor: "#ffffff",
               borderRadius: 1,
-              width: "100%"
+              width: "100%",
             }}
             InputProps={{
               startAdornment: (
@@ -395,7 +402,7 @@ const TransactionsComponent = () => {
             fullWidth
             size="small"
             sx={{
-              bgcolor: "#ffffff", 
+              bgcolor: "#ffffff",
               borderRadius: 1,
             }}
           >
@@ -423,7 +430,7 @@ const TransactionsComponent = () => {
             onChange={(e) => handleDateChange("start", e.target.value)}
             fullWidth
             sx={{
-              bgcolor: "#ffffff", // White background
+              bgcolor: "#ffffff",
               borderRadius: 1,
             }}
           />
@@ -440,7 +447,7 @@ const TransactionsComponent = () => {
             onChange={(e) => handleDateChange("end", e.target.value)}
             fullWidth
             sx={{
-              bgcolor: "#ffffff", // White background
+              bgcolor: "#ffffff",
               borderRadius: 1,
             }}
           />
@@ -532,7 +539,9 @@ const TransactionsComponent = () => {
                     {new Date(transaction.date).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                    {new Date(transaction.date).toLocaleTimeString()}
+                    {new Date(transaction.date).toLocaleTimeString("en-IN", {
+                      timeZone: "Asia/Kolkata",
+                    })}
                   </TableCell>
                 </TableRow>
               ))
