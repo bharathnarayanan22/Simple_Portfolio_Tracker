@@ -33,6 +33,7 @@ import "react-toastify/dist/ReactToastify.css";
 import MoneyIcon from "@mui/icons-material/Money";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
+import gif1 from "../assets/gif1.gif";
 
 const WatchlistComponent = () => {
   const [stockIds, setStockIds] = useState([]);
@@ -526,9 +527,24 @@ const WatchlistComponent = () => {
             ))}
       </Grid>
       {stocks.length === 0 && (
-        <Typography variant="h6" textAlign="center" mt={4}>
-          No stocks in your watchlist.
-        </Typography>
+        <Box textAlign="center" mt={4}>
+                      <img
+                        src={gif1} 
+                        alt="No stocks"
+                        style={{ maxWidth: "40%", margin: "0 auto" }}
+                      />
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          mt: 2,
+                          fontWeight: "bold",
+                          fontFamily: "'Poppins', sans-serif",
+                          color: "#555",
+                        }}
+                      >
+                        No Stocks in your Watchlist...
+                      </Typography>
+                    </Box>
       )}
       <Dialog
         open={buyDialogOpen}
