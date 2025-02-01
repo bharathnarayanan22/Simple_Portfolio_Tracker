@@ -78,3 +78,7 @@ The frontend uses **React** and connects to the backend API hosted on **Render**
 - use cmd `cd frontend` to get into the frontend
 - use cmd `npm install` to install the frontend dependencies
 - use cmd `npm run dev` to run the frontend
+
+## Sample Credentials to see my work
+- email: bharath@gmail.com
+- password: 1234
